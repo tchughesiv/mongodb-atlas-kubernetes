@@ -37,6 +37,7 @@ import (
 	"github.com/mongodb/mongodb-atlas-kubernetes/pkg/controller/atlascluster"
 	"github.com/mongodb/mongodb-atlas-kubernetes/pkg/controller/atlasdatabaseuser"
 	"github.com/mongodb/mongodb-atlas-kubernetes/pkg/controller/atlasproject"
+	"github.com/mongodb/mongodb-atlas-kubernetes/pkg/controller/atlasservice"
 	"github.com/mongodb/mongodb-atlas-kubernetes/pkg/controller/watch"
 	"github.com/mongodb/mongodb-atlas-kubernetes/pkg/util/kube"
 	// +kubebuilder:scaffold:imports
@@ -81,6 +82,18 @@ func main() {
 	}
 
 	operatorPod := operatorDeploymentObjectKey()
+
+	if err = (&atlasservice.AtlasServiceReconciler{
+		Client:          mgr.GetClient(),
+		Log:             logger.Named("controllers").Named("AtlasServices").Sugar(),
+		Scheme:          mgr.GetScheme(),
+		AtlasDomain:     config.AtlasDomain,
+		ResourceWatcher: watch.NewResourceWatcher(),
+		OperatorPod:     operatorPod,
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "AtlasService")
+		os.Exit(1)
+	}
 
 	if err = (&atlascluster.AtlasClusterReconciler{
 		Client:                 mgr.GetClient(),
@@ -147,7 +160,7 @@ func parseConfiguration(log *zap.SugaredLogger) Config {
 	config := Config{}
 	flag.StringVar(&config.AtlasDomain, "atlas-domain", "https://cloud.mongodb.com", "the Atlas URL domain name (no slash in the end).")
 	flag.StringVar(&config.MetricsAddr, "metrics-bind-address", ":8080", "The address the metric endpoint binds to.")
-	flag.StringVar(&config.ProbeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
+	flag.StringVar(&config.ProbeAddr, "health-probe-bind-address", ":9091", "The address the probe endpoint binds to.")
 	flag.BoolVar(&config.EnableLeaderElection, "leader-elect", false,
 		"Enable leader election for controller manager. "+
 			"Enabling this will ensure there is only one active controller manager.")
@@ -167,11 +180,13 @@ func parseConfiguration(log *zap.SugaredLogger) Config {
 func operatorDeploymentObjectKey() client.ObjectKey {
 	operatorPodName := os.Getenv("OPERATOR_POD_NAME")
 	if operatorPodName == "" {
-		log.Fatal(`"OPERATOR_POD_NAME" environment variable must be set!`)
+		operatorPodName = "mongodb-atlas-operator-5556b67fc8-5g5g"
+		//log.Fatal(`"OPERATOR_POD_NAME" environment variable must be set!`)
 	}
 	operatorNamespace := os.Getenv("OPERATOR_NAMESPACE")
 	if operatorNamespace == "" {
-		log.Fatal(`"OPERATOR_NAMESPACE" environment variable must be set!`)
+		operatorNamespace = "mongodb-atlas-system"
+		//log.Fatal(`"OPERATOR_NAMESPACE" environment variable must be set!`)
 	}
 	deploymentName, err := kube.ParseDeploymentNameFromPodName(operatorPodName)
 	if err != nil {

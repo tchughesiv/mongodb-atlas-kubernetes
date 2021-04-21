@@ -34,7 +34,7 @@ BUNDLE_METADATA_OPTS ?= $(BUNDLE_CHANNELS) $(BUNDLE_DEFAULT_CHANNEL)
 BUNDLE_IMG ?= controller-bundle:$(VERSION)
 
 # Image URL to use all building/pushing image targets
-IMG ?= controller:latest
+IMG ?= quay.io/jianrzha/mongodb-atlas-operator:0.5.2
 
 # Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
 ifeq (,$(shell go env GOBIN))
@@ -134,6 +134,9 @@ rm -rf $$TMP_DIR ;\
 }
 endef
 
+# make bundle-build BUNDLE_IMG=quay.io/jianrzha/dbaas-poc:v0.5.1
+# make docker-push IMG=quay.io/jianrzha/dbaas-poc:v0.5.1
+
 .PHONY: bundle
 bundle: manifests kustomize ## Generate bundle manifests and metadata, then validate generated files.
 	operator-sdk generate kustomize manifests -q --apis-dir=pkg/api
@@ -146,6 +149,7 @@ bundle-build: ## Build the bundle image.
 	docker build -f bundle.Dockerfile -t $(BUNDLE_IMG) .
 
 docker-push: ## Push the docker image
+	docker build -t ${IMG} .
 	docker push ${IMG}
 
 # Additional make goals
