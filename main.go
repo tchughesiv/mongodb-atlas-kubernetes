@@ -23,6 +23,14 @@ import (
 	"time"
 
 	"github.com/go-logr/zapr"
+	mdbv1 "github.com/mongodb/mongodb-atlas-kubernetes/pkg/api/v1"
+	"github.com/mongodb/mongodb-atlas-kubernetes/pkg/controller/atlascluster"
+	"github.com/mongodb/mongodb-atlas-kubernetes/pkg/controller/atlasdatabaseuser"
+	"github.com/mongodb/mongodb-atlas-kubernetes/pkg/controller/atlasproject"
+	"github.com/mongodb/mongodb-atlas-kubernetes/pkg/controller/atlasservice"
+	"github.com/mongodb/mongodb-atlas-kubernetes/pkg/controller/dbaasconnection"
+	"github.com/mongodb/mongodb-atlas-kubernetes/pkg/controller/watch"
+	"github.com/mongodb/mongodb-atlas-kubernetes/pkg/util/kube"
 	"go.uber.org/zap"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
@@ -32,14 +40,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	ctrzap "sigs.k8s.io/controller-runtime/pkg/log/zap"
-
-	mdbv1 "github.com/mongodb/mongodb-atlas-kubernetes/pkg/api/v1"
-	"github.com/mongodb/mongodb-atlas-kubernetes/pkg/controller/atlascluster"
-	"github.com/mongodb/mongodb-atlas-kubernetes/pkg/controller/atlasdatabaseuser"
-	"github.com/mongodb/mongodb-atlas-kubernetes/pkg/controller/atlasproject"
-	"github.com/mongodb/mongodb-atlas-kubernetes/pkg/controller/atlasservice"
-	"github.com/mongodb/mongodb-atlas-kubernetes/pkg/controller/watch"
-	"github.com/mongodb/mongodb-atlas-kubernetes/pkg/util/kube"
 	// +kubebuilder:scaffold:imports
 )
 
@@ -92,6 +92,19 @@ func main() {
 		OperatorPod:     operatorPod,
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "AtlasService")
+		os.Exit(1)
+	}
+
+	if err = (&dbaasconnection.DbaaSConnectionReconciler{
+		Client: mgr.GetClient(),
+		//RestClient:      *restClient,
+		Log:             logger.Named("controllers").Named("DbaaSConnections").Sugar(),
+		Scheme:          mgr.GetScheme(),
+		AtlasDomain:     config.AtlasDomain,
+		ResourceWatcher: watch.NewResourceWatcher(),
+		OperatorPod:     operatorPod,
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "DbaaSConnection")
 		os.Exit(1)
 	}
 

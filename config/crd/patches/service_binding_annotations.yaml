@@ -1,0 +1,9 @@
+# The following patch adds annotations to the CRD
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: dbaasconnections.atlas.mongodb.com
+  annotations:
+    service.binding/db.connectionString: 'path={.status.connectionString},objectType=ConfigMap'
+    service.binding/db.user: 'path={.status.dbUserSecret},objectType=Secret'
+    service.binding/db.password: 'path={.status.dbUserSecret},objectType=Secret'

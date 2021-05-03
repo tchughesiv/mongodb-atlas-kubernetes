@@ -21,6 +21,26 @@ rules:
 - apiGroups:
   - atlas.mongodb.com
   resources:
+  - DbaaSConnections
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - atlas.mongodb.com
+  resources:
+  - DbaaSConnections/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - atlas.mongodb.com
+  resources:
   - atlasclusters
   verbs:
   - create
@@ -119,6 +139,26 @@ rules:
   - patch
   - update
   - watch
+- apiGroups:
+  - atlas.mongodb.com
+  resources:
+  - DbaaSConnections
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - atlas.mongodb.com
+  resources:
+  - DbaaSConnections/status
+  verbs:
+  - get
+  - patch
+  - update
 - apiGroups:
   - atlas.mongodb.com
   resources:
