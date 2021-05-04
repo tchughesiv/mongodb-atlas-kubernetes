@@ -118,6 +118,26 @@ rules:
   - get
   - patch
   - update
+- apiGroups:
+  - atlas.mongodb.com
+  resources:
+  - dbaasconnections
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - atlas.mongodb.com
+  resources:
+  - dbaasconnections/status
+  verbs:
+  - get
+  - patch
+  - update
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -142,7 +162,7 @@ rules:
 - apiGroups:
   - atlas.mongodb.com
   resources:
-  - DbaaSConnections
+  - dbaasconnections
   verbs:
   - create
   - delete
@@ -154,7 +174,7 @@ rules:
 - apiGroups:
   - atlas.mongodb.com
   resources:
-  - DbaaSConnections/status
+  - dbaasconnections/status
   verbs:
   - get
   - patch

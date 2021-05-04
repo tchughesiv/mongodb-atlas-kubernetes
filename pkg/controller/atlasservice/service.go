@@ -31,6 +31,7 @@ func (r *AtlasServiceReconciler) discoverServices(ctx *workflow.Context) ([]stat
 				InstanceSizeName: cluster.ProviderSettings.InstanceSizeName,
 				ProviderName:     cluster.ProviderSettings.ProviderName,
 				RegionName:       cluster.ProviderSettings.RegionName,
+				ConnectionString: cluster.ConnectionStrings.StandardSrv,
 			}
 			clusterList = append(clusterList, clusterSvc)
 		}

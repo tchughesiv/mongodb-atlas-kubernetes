@@ -7,9 +7,6 @@ metadata:
     controller-gen.kubebuilder.io/version: v0.4.1
   creationTimestamp: null
   name: dbaasconnections.atlas.mongodb.com
-  annotations:
-    service.binding/connectionString: 'path={.status.connectionString}'
-    service.binding/dbUserSecret: 'path={.status.dbUserSecret},objectType=Secret'
 spec:
   group: atlas.mongodb.com
   names:
