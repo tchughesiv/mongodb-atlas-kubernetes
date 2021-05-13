@@ -10,9 +10,11 @@ require (
 	github.com/Masterminds/semver v1.5.0
 	github.com/aws/aws-sdk-go v1.44.151
 	github.com/fatih/structtag v1.2.0
+	github.com/fgrosse/zaptest v1.1.0
 	github.com/go-logr/zapr v1.2.3
 	github.com/google/go-cmp v0.5.9
 	github.com/google/uuid v1.3.0
+	github.com/gorilla/mux v1.8.0
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/mongodb-forks/digest v1.0.4
 	github.com/onsi/ginkgo/v2 v2.5.0
@@ -31,6 +33,8 @@ require (
 	k8s.io/apimachinery v0.25.3
 	k8s.io/client-go v0.25.3
 	sigs.k8s.io/controller-runtime v0.13.0
+	k8s.io/utils v0.0.0-20220210201930-3a6ce19ff2f9
+	github.com/RHEcosystemAppEng/dbaas-operator v0.1.5
 )
 
 require (

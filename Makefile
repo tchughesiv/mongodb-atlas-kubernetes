@@ -9,7 +9,13 @@ CONTAINER_ENGINE?=docker
 # To re-generate a bundle for another specific version without changing the standard setup, you can:
 # - use the VERSION as arg of the bundle target (e.g make bundle VERSION=0.0.2)
 # - use environment variables to overwrite this value (e.g export VERSION=0.0.2)
-VERSION ?= $(shell git describe --tags --dirty --broken | cut -c 2-)
+VERSION ?= 0.3.0
+
+ifndef PRODUCT_VERSION
+PRODUCT_VERSION := $(shell git describe --tags --dirty --broken)
+endif
+
+CONTAINER_ENGINE?=docker
 
 # CHANNELS define the bundle channels used in the bundle.
 # Add a new line here if you would like to change its default config. (E.g CHANNELS = "preview,fast,stable")
@@ -42,16 +48,19 @@ BUNDLE_METADATA_OPTS ?= $(BUNDLE_CHANNELS) $(BUNDLE_DEFAULT_CHANNEL)
 
 # Base registry for the operator, bundle, catalog images
 REGISTRY ?= quay.io/mongodb
-# BUNDLE_IMG defines the image:tag used for the bundle.
-# You can use it as an arg. (E.g make bundle-build BUNDLE_IMG=<some-registry>/<project-name-bundle>:<tag>)
-BUNDLE_IMG ?= $(REGISTRY)/mongodb-atlas-kubernetes-operator-prerelease-bundle:$(VERSION)
+# Image URL to use all building/pushing image targets
+IMG ?= $(REGISTRY)/mongodb-atlas-kubernetes-dbaas
+OPERATOR_REGISTRY ?= $(IMG)
 
-#IMG ?= mongodb-atlas-kubernetes-operator:latest
-#BUNDLE_REGISTRY ?= $(REGISTRY)/mongodb-atlas-operator-bundle
-OPERATOR_REGISTRY ?= $(REGISTRY)/mongodb-atlas-kubernetes-operator-prerelease
-CATALOG_REGISTRY ?= $(REGISTRY)/mongodb-atlas-kubernetes-operator-prerelease-catalog
-OPERATOR_IMAGE ?= ${OPERATOR_REGISTRY}:${VERSION}
-CATALOG_IMAGE ?= ${CATALOG_REGISTRY}:${VERSION}
+OPERATOR_IMG ?= $(IMG):$(VERSION)
+# OPERATOR_IMG ?= $(IMG):latest
+
+BUNDLE_IMG ?= $(IMG)-bundle:$(VERSION)
+# BUNDLE_IMG ?= $(IMG)-bundle:latest
+
+CATALOG_IMG ?= $(IMG)-catalog:$(VERSION)
+# CATALOG_IMG ?= ${IMG}-catalog:latest
+
 TARGET_NAMESPACE ?= mongodb-atlas-operator-system-test
 
 # Image URL to use all building/pushing image targets
@@ -176,39 +185,46 @@ rm -rf $$TMP_DIR ;\
 endef
 
 .PHONY: bundle
-bundle: manifests kustomize ## Generate bundle manifests and metadata, then validate generated files.
+bundle: manifests kustomize ## Generate bundle manifests and metadata, update security context for OpenShift, then validate generated files.
 	@echo "Building bundle $(VERSION)"
 	operator-sdk generate kustomize manifests -q --apis-dir=pkg/api
-	cd config/manager && $(KUSTOMIZE) edit set image controller=$(IMG)
-	$(KUSTOMIZE) build --load-restrictor LoadRestrictionsNone config/manifests | operator-sdk generate bundle -q --overwrite --version $(VERSION) $(BUNDLE_METADATA_OPTS)
+	cd config/manager && $(KUSTOMIZE) edit set image controller=$(OPERATOR_IMG)
+	$(KUSTOMIZE) build --load-restrictor LoadRestrictionsNone config/manifests | operator-sdk generate bundle -q --overwrite --manifests --version $(VERSION) $(BUNDLE_METADATA_OPTS)
 	operator-sdk bundle validate ./bundle
 
 .PHONY: image
-image: ## Build the operator image
-	$(CONTAINER_ENGINE) build --build-arg VERSION=$(VERSION) -t $(OPERATOR_IMAGE) .
-	$(CONTAINER_ENGINE) push $(OPERATOR_IMAGE)
+image: manager ## Build the operator image
+	$(CONTAINER_ENGINE) build -t $(OPERATOR_IMG) .
+	$(CONTAINER_ENGINE) push $(OPERATOR_IMG)
 
 .PHONY: bundle-build
 bundle-build: ## Build the bundle image.
 	$(CONTAINER_ENGINE) build -f bundle.Dockerfile -t $(BUNDLE_IMG) .
 
 .PHONY: bundle-push
-bundle-push:
+bundle-push: ## Push the bundle image.
 	$(CONTAINER_ENGINE) push $(BUNDLE_IMG)
+
+# A comma-separated list of bundle images (e.g. make catalog-build BUNDLE_IMGS=example.com/operator-bundle:v0.1.0,example.com/operator-bundle:v0.2.0).
+# These images MUST exist in a registry and be pull-able.
+BUNDLE_IMGS ?= $(BUNDLE_IMG)
 
 .PHONY: catalog-build
 CATALOG_DIR ?= ./scripts/openshift/atlas-catalog
-catalog-build: image
+#catalog-build: IMG=
+catalog-build: ## bundle bundle-push ## Build file-based bundle
+	$(MAKE) image IMG=$(IMG)
 	CATALOG_DIR=$(CATALOG_DIR) \
 	CHANNEL=$(DEFAULT_CHANNEL) \
-	CATALOG_IMAGE=$(CATALOG_IMAGE) \
+	CATALOG_IMAGE=$(CATALOG_IMG) \
 	BUNDLE_IMAGE=$(BUNDLE_IMG) \
 	VERSION=$(VERSION) \
+	CONTAINER_ENGINE=$(CONTAINER_ENGINE) \
 	./scripts/build_catalog.sh
 
 .PHONY: catalog-push
 catalog-push:
-	$(CONTAINER_ENGINE) push $(CATALOG_IMAGE)
+	$(CONTAINER_ENGINE) push $(CATALOG_IMG)
 
 .PHONY: build-subscription
 build-subscription:
@@ -226,6 +242,7 @@ build-catalogsource:
 
 .PHONY: deploy-olm
 # Deploy atlas operator to the running openshift cluster with OLM
+deploy-olm: export IMG=$(OPERATOR_IMAGE)
 deploy-olm: bundle-build bundle-push catalog-build catalog-push build-catalogsource build-subscription
 	oc -n openshift-marketplace delete catalogsource mongodb-atlas-kubernetes-local --ignore-not-found
 	oc delete namespace $(TARGET_NAMESPACE) --ignore-not-found
@@ -241,7 +258,7 @@ deploy-olm: bundle-build bundle-push catalog-build catalog-push build-catalogsou
 
 .PHONY: image-push
 image-push: ## Push the docker image
-	$(CONTAINER_ENGINE) push ${IMG}
+	$(CONTAINER_ENGINE) push ${OPERATOR_IMG}
 
 # Additional make goals
 .PHONY: run-kind

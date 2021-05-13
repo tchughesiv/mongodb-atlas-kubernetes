@@ -25,6 +25,14 @@ rules:
   - update
   - watch
 - apiGroups:
+  - apps
+  resources:
+  - deployments
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
   - atlas.mongodb.com
   resources:
   - atlasbackuppolicies
@@ -125,9 +133,15 @@ rules:
   - patch
   - update
 - apiGroups:
+<<<<<<< HEAD
   - atlas.mongodb.com
   resources:
   - atlasteams
+=======
+  - dbaas.redhat.com
+  resources:
+  - dbaasproviders
+>>>>>>> 26c3136 (Integrate Atlas Operator with Red Hat DBaaS)
   verbs:
   - create
   - delete
@@ -137,9 +151,75 @@ rules:
   - update
   - watch
 - apiGroups:
+<<<<<<< HEAD
   - atlas.mongodb.com
   resources:
   - atlasteams/status
+=======
+  - dbaas.redhat.com
+  resources:
+  - dbaasproviders/status
+>>>>>>> 26c3136 (Integrate Atlas Operator with Red Hat DBaaS)
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - dbaas.redhat.com
+  resources:
+  - mongodbatlasconnections
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - dbaas.redhat.com
+  resources:
+  - mongodbatlasconnections/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - dbaas.redhat.com
+  resources:
+  - mongodbatlasinstances
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - dbaas.redhat.com
+  resources:
+  - mongodbatlasinstances/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - dbaas.redhat.com
+  resources:
+  - mongodbatlasinventories
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - dbaas.redhat.com
+  resources:
+  - mongodbatlasinventories/status
   verbs:
   - get
   - patch
