@@ -28,6 +28,46 @@ rules:
 - apiGroups:
   - atlas.mongodb.com
   resources:
+  - MongoDBAtlasConnections
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - atlas.mongodb.com
+  resources:
+  - MongoDBAtlasConnections/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - atlas.mongodb.com
+  resources:
+  - MongoDBAtlasInventorys
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - atlas.mongodb.com
+  resources:
+  - MongoDBAtlasInventorys/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - atlas.mongodb.com
+  resources:
   - atlasclusters
   verbs:
   - create

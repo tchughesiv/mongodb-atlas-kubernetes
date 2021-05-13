@@ -146,6 +146,9 @@ bundle: manifests kustomize ## Generate bundle manifests and metadata, then vali
 bundle-build: ## Build the bundle image.
 	docker build -f bundle.Dockerfile -t $(BUNDLE_IMG) .
 
+docker-build: ## Build the docker image
+	docker build -t ${IMG} .
+
 docker-push: ## Push the docker image
 	docker push ${IMG}
 

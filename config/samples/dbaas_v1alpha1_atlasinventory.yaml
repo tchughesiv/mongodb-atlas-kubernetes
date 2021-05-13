@@ -1,0 +1,10 @@
+apiVersion: dbaas.redhat.com/v1alpha1
+kind: MongoDBAtlasInventory
+metadata:
+  name: test-inventory
+spec:
+  provider:
+    name: mongodbatlas
+  credentialsRef:
+    name: my-atlas-key
+    namespace: mongodb-atlas-system
