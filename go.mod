@@ -3,11 +3,14 @@ module github.com/mongodb/mongodb-atlas-kubernetes
 go 1.15
 
 require (
+	github.com/RHEcosystemAppEng/dbaas-operator v1.0.0
 	github.com/fatih/structtag v1.2.0
+	github.com/fgrosse/zaptest v1.1.0
 	github.com/go-logr/logr v0.4.0 // indirect
 	github.com/go-logr/zapr v0.4.0
 	github.com/golang/snappy v0.0.2 // indirect
 	github.com/google/go-cmp v0.5.6
+	github.com/gorilla/mux v1.8.0
 	github.com/mongodb-forks/digest v1.0.2
 	github.com/mxschmitt/playwright-go v0.1100.0
 	github.com/onsi/ginkgo v1.16.4
@@ -21,8 +24,11 @@ require (
 	golang.org/x/sys v0.0.0-20210630005230-0f9fa26af87c // indirect
 	golang.org/x/tools v0.1.5 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
-	k8s.io/api v0.19.2
-	k8s.io/apimachinery v0.19.2
-	k8s.io/client-go v0.19.2
-	sigs.k8s.io/controller-runtime v0.7.0
+	k8s.io/api v0.20.2
+	k8s.io/apimachinery v0.20.2
+	k8s.io/client-go v0.20.2
+	k8s.io/utils v0.0.0-20210709001253-0e1f9d693477
+	sigs.k8s.io/controller-runtime v0.8.3
 )
+
+replace github.com/RHEcosystemAppEng/dbaas-operator v1.0.0 => github.com/RHEcosystemAppEng/dbaas-operator v1.0.1-0.20210728155403-fcf7cfba855c
