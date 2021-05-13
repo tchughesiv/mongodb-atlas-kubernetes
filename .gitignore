@@ -32,3 +32,4 @@ event_*.json
 my-*
 tags
 testbin/
+__debug_bin/
