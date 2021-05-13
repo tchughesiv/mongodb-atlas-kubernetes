@@ -71,3 +71,24 @@ const (
 	TeamUsersNotReady     ConditionReason = "TeamUsersNotReady"
 	TeamDoesNotExist      ConditionReason = "TeamDoesNotExist"
 )
+
+// MongoDBAtlasInventory reasons
+const (
+	MongoDBAtlasInventorySyncOK              ConditionReason = "SyncOK"
+	MongoDBAtlasInventoryInputError          ConditionReason = "InputError"
+	MongoDBAtlasInventoryBackendError        ConditionReason = "BackendError"
+	MongoDBAtlasInventoryEndpointUnreachable ConditionReason = "EndpointUnreachable"
+	MongoDBAtlasInventoryAuthenticationError ConditionReason = "AuthenticationError"
+)
+
+// MongoDBAtlasConnection reasons
+const (
+	MongoDBAtlasConnectionReady               ConditionReason = "Ready"
+	MongoDBAtlasConnectionAtlasUnreachable    ConditionReason = "Unreachable"
+	MongoDBAtlasConnectionInventoryNotReady   ConditionReason = "InventoryNotReady"
+	MongoDBAtlasConnectionInventoryNotFound   ConditionReason = "InventoryNotFound"
+	MongoDBAtlasConnectionInstanceIDNotFound  ConditionReason = "InstanceIDNotFound"
+	MongoDBAtlasConnectionBackendError        ConditionReason = "BackendError"
+	MongoDBAtlasConnectionAuthenticationError ConditionReason = "AuthenticationError"
+	MongoDBAtlasConnectionInprogress          ConditionReason = "Inprogress"
+)
