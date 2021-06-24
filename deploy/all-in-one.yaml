@@ -1250,6 +1250,23 @@ metadata:
 rules:
 - apiGroups:
   - ""
+  resourceNames:
+  - mongodb-atlas-registration
+  resources:
+  - configmaps
+  verbs:
+  - create
+  - get
+  - list
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - ""
   resources:
   - events
   verbs:

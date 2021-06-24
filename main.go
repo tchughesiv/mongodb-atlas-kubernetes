@@ -42,6 +42,7 @@ import (
 	"github.com/mongodb/mongodb-atlas-kubernetes/pkg/controller/atlasdatabaseuser"
 	"github.com/mongodb/mongodb-atlas-kubernetes/pkg/controller/atlasinventory"
 	"github.com/mongodb/mongodb-atlas-kubernetes/pkg/controller/atlasproject"
+	"github.com/mongodb/mongodb-atlas-kubernetes/pkg/controller/dbaasregistration"
 	"github.com/mongodb/mongodb-atlas-kubernetes/pkg/controller/watch"
 	"github.com/mongodb/mongodb-atlas-kubernetes/pkg/util/kube"
 	// +kubebuilder:scaffold:imports
@@ -115,6 +116,11 @@ func main() {
 		setupLog.Error(err, "unable to create clientset")
 		os.Exit(1)
 	}
+	if err := dbaasregistration.CreateAtlasRegistrationConfigMap(clientset, setupLog); err != nil {
+		setupLog.Error(err, "unable to create Provider Registration ConfigMap")
+		os.Exit(1)
+	}
+
 	if err = (&atlasconnection.MongoDBAtlasConnectionReconciler{
 		Client:          mgr.GetClient(),
 		Clientset:       clientset,

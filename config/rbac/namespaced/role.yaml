@@ -8,11 +8,28 @@ metadata:
 rules:
 - apiGroups:
   - ""
+  resourceNames:
+  - mongodb-atlas-registration
+  resources:
+  - configmaps
+  verbs:
+  - create
+  - get
+  - list
+- apiGroups:
+  - ""
   resources:
   - events
   verbs:
   - create
   - patch
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  verbs:
+  - get
+  - list
 - apiGroups:
   - ""
   resources:
@@ -25,46 +42,6 @@ rules:
   - patch
   - update
   - watch
-- apiGroups:
-  - atlas.mongodb.com
-  resources:
-  - MongoDBAtlasConnections
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - atlas.mongodb.com
-  resources:
-  - MongoDBAtlasConnections/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - atlas.mongodb.com
-  resources:
-  - MongoDBAtlasInventorys
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - atlas.mongodb.com
-  resources:
-  - MongoDBAtlasInventorys/status
-  verbs:
-  - get
-  - patch
-  - update
 - apiGroups:
   - atlas.mongodb.com
   resources:
@@ -121,6 +98,46 @@ rules:
   - atlas.mongodb.com
   resources:
   - atlasprojects/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - dbaas.redhat.com
+  resources:
+  - mongodbatlasconnections
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - dbaas.redhat.com
+  resources:
+  - mongodbatlasconnections/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - dbaas.redhat.com
+  resources:
+  - mongodbatlasinventories
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - dbaas.redhat.com
+  resources:
+  - mongodbatlasinventories/status
   verbs:
   - get
   - patch
