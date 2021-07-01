@@ -488,7 +488,7 @@ spec:
         serviceAccountName: mongodb-atlas-operator
     strategy: deployment
   installModes:
-  - supported: true
+  - supported: false
     type: OwnNamespace
   - supported: false
     type: SingleNamespace

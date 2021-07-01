@@ -8,4 +8,4 @@ kind: Kustomization
 images:
 - name: controller
   newName: quay.io/ecosystem-appeng/mongodb-atlas-operator
-  newTag: 0.6.7
+  newTag: 0.6.8
