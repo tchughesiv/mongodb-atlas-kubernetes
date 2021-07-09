@@ -29,12 +29,13 @@ func discoverInstances(atlasClient *mongodbatlas.Client) ([]dbaasv1alpha1.Instan
 				InstanceID: cluster.ID,
 				Name:       cluster.Name,
 				InstanceInfo: map[string]string{
-					dbaas.InstanceSizeNameKey: cluster.ProviderSettings.InstanceSizeName,
-					dbaas.CloudProviderKey:    cluster.ProviderSettings.ProviderName,
-					dbaas.CloudRegionKey:      cluster.ProviderSettings.RegionName,
-					dbaas.ProjectIDKey:        p.ID,
-					dbaas.ProjectNameKey:      p.Name,
-					dbaas.ConnectionStringKey: cluster.ConnectionStrings.StandardSrv,
+					dbaas.InstanceSizeNameKey:             cluster.ProviderSettings.InstanceSizeName,
+					dbaas.CloudProviderKey:                cluster.ProviderSettings.ProviderName,
+					dbaas.CloudRegionKey:                  cluster.ProviderSettings.RegionName,
+					dbaas.ProjectIDKey:                    p.ID,
+					dbaas.ProjectNameKey:                  p.Name,
+					dbaas.ConnectionStringsStandardSrvKey: cluster.ConnectionStrings.StandardSrv,
+					dbaas.ConnectionStringsStandardKey:    cluster.ConnectionStrings.Standard,
 				},
 			}
 			instanceList = append(instanceList, clusterSvc)

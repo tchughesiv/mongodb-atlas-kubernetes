@@ -95,7 +95,6 @@ func (r *MongoDBAtlasInventoryReconciler) Reconcile(ctx context.Context, req ctr
 		// the services once that secret is changed
 		r.EnsureResourcesAreWatched(req.NamespacedName, "Secret", log, *secretKey)
 	}
-	inventory.Status.Type = dbaas.ServiceBindingProviderName
 	atlasConn, err := atlas.ReadConnection(log, r.Client, r.GlobalAPISecret, inventory.ConnectionSecretObjectKey())
 	if err != nil {
 		result := workflow.Terminate(workflow.MongoDBAtlasInventoryInputError, err.Error())

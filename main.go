@@ -121,6 +121,9 @@ func main() {
 		os.Exit(1)
 	}
 
+	//Clean up the registration configmap when the Atlas Operator terminates
+	defer dbaasregistration.CleanupAtlasRegistrationConfigMap(clientset, setupLog)
+
 	if err = (&atlasconnection.MongoDBAtlasConnectionReconciler{
 		Client:          mgr.GetClient(),
 		Clientset:       clientset,

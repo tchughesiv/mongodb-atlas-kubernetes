@@ -21,7 +21,6 @@ import (
 
 	"fmt"
 	"math/rand"
-	"strings"
 	"time"
 
 	"go.uber.org/zap"
@@ -53,10 +52,9 @@ import (
 const (
 	DBUserNameKey = "username"
 	DBPasswordKey = "password"
-
-	digits   = "0123456789"
-	specials = "~=+%^*/()[]{}/!@#$?|"
-	all      = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz" + digits + specials
+	digits        = "0123456789"
+	specials      = "~=+%^*/()[]{}/!@#$?|"
+	all           = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz" + digits + specials
 )
 
 // MongoDBAtlasConnectionReconciler reconciles a MongoDBAtlasConnection object
@@ -97,20 +95,8 @@ func (r *MongoDBAtlasConnectionReconciler) Reconcile(cx context.Context, req ctr
 	}
 
 	if isReadyForBinding(conn) {
-		if !isInstanceIDChanged(conn) {
-			// The database instanceID in the CR has been successfully reconciled earlier.
-			// No more reconciliation is needed
-			return ctrl.Result{}, nil
-		}
-		// database instanceID has changed.
-		// The db user and its secret object are outdated and must be cleaned up
-		r.deleteDBUser(conn, log)
-
-		//reset the status
-		dbaas.SetConnectionCondition(conn, string(status.MongoDBAtlasConnectionReadyType), metav1.ConditionFalse, string(workflow.MongoDBAtlasConnectionInprogress), "Database instanceID changed")
-		conn.Status.ConnectionString = ""
-		conn.Status.CredentialsRef = nil
-		conn.Status.ConnectionInfo = nil
+		//For this release, the InstanceID is mutable, so no reconciliation is needed.
+		return ctrl.Result{}, nil
 	}
 
 	// This update will make sure the status is always updated in case of any errors or successful result
@@ -151,6 +137,15 @@ func (r *MongoDBAtlasConnectionReconciler) Reconcile(cx context.Context, req ctr
 
 	projectID := instance.InstanceInfo[dbaas.ProjectIDKey]
 
+	// Now create a configmap for non-sensitive information needed for connecting to the DB instance
+	cm := getOwnedConfigMap(conn, instance.InstanceInfo[dbaas.ConnectionStringsStandardSrvKey], instance.InstanceInfo[dbaas.ConnectionStringsStandardKey])
+	cmCreated, err := r.Clientset.CoreV1().ConfigMaps(req.Namespace).Create(context.Background(), cm, metav1.CreateOptions{})
+	if err != nil {
+		result := workflow.Terminate(workflow.MongoDBAtlasConnectionBackendError, err.Error())
+		dbaas.SetConnectionCondition(conn, string(status.MongoDBAtlasConnectionReadyType), metav1.ConditionFalse, string(result.Reason()), result.Message())
+		return ctrl.Result{}, err
+	}
+
 	// Generate a db username and password
 	dbUserName := fmt.Sprintf("atlas-db-user-%v", time.Now().UnixNano())
 	dbPassword := generatePassword()
@@ -173,12 +168,8 @@ func (r *MongoDBAtlasConnectionReconciler) Reconcile(cx context.Context, req ctr
 
 	// Update the status
 	dbaas.SetConnectionCondition(conn, string(status.MongoDBAtlasConnectionReadyType), metav1.ConditionTrue, "Ready", "")
-	conn.Status.ConnectionString = instance.InstanceInfo[dbaas.ConnectionStringKey]
 	conn.Status.CredentialsRef = &corev1.LocalObjectReference{Name: secretCreated.Name}
-	conn.Status.ConnectionInfo = map[string]string{
-		dbaas.ProjectIDKey:  projectID,
-		dbaas.InstanceIDKey: conn.Spec.InstanceID,
-	}
+	conn.Status.ConnectionInfoRef = &corev1.LocalObjectReference{Name: cmCreated.Name}
 	return ctrl.Result{}, nil
 }
 
@@ -234,14 +225,9 @@ func (r *MongoDBAtlasConnectionReconciler) deleteDBUser(conn *dbaas.MongoDBAtlas
 	}
 	dbUserName = string(dbUser)
 
-	//Retrieve the projectID from the status
-	projectID, ok := conn.Status.ConnectionInfo[dbaas.ProjectIDKey]
-	if !ok {
-		log.Infow("No projectID found. Deletion done.")
-		return nil
-	}
-
-	//Fetch the inventory
+	// The corresponding inventory and instanceID in the Spec are immutable, so we can determine the
+	// project ID from the instances in the inventory based on the instanceID.
+	// First find the corresponding inventory
 	inventory := &dbaas.MongoDBAtlasInventory{}
 	if err := r.Client.Get(context.Background(), types.NamespacedName{Namespace: conn.Namespace, Name: conn.Spec.InventoryRef.Name}, inventory); err != nil {
 		if errors.IsNotFound(err) {
@@ -253,17 +239,33 @@ func (r *MongoDBAtlasConnectionReconciler) deleteDBUser(conn *dbaas.MongoDBAtlas
 		return err
 	}
 
+	if !isInventoryReady(inventory) {
+		//The corresponding inventory is not ready yet, requeue
+		//Nothing to clean up
+		return nil
+	}
+
+	// Retrieve the instance from inventory based on instanceID
+	instance := getInstance(inventory, conn.Spec.InstanceID)
+	if instance == nil {
+		log.Infow("No instance found in the inventory. Deletion done.")
+		return nil
+	}
+
+	// Get the projectID from the status
+	projectID, ok := instance.InstanceInfo[dbaas.ProjectIDKey]
+	if !ok {
+		log.Infow("No projectID found. Deletion done.")
+		return nil
+	}
+
+	// Now delete the db user from Atlas
 	if err := r.deleteDBUserFromAtlas(conn, projectID, dbUserName, inventory, log); err != nil {
-		log.Errorf("Failed to remove cluster from Atlas: %s", err)
+		log.Errorf("Failed to remove db user from Atlas: %s", err)
 		return err
 	}
 
-	//Delete the secret
-	if err := r.Client.Delete(context.Background(), secret); err != nil {
-		log.Errorf("Failed to delete secret", "secretName", secret.Name, "error", err)
-		return err
-	}
-	log.Info("Deletion of db user completed", "spec", conn.Spec)
+	// db user secret and connectioninfo configmap are automatically deleted based on owner references
 	return nil
 }
 
@@ -345,6 +347,40 @@ func (r *MongoDBAtlasConnectionReconciler) deleteDBUserFromAtlas(conn *dbaas.Mon
 	return nil
 }
 
+// getOwnedConfigMap returns a configmap object with ownership set
+func getOwnedConfigMap(connection *dbaas.MongoDBAtlasConnection, connectionStringStandardSrv, connectionStringStandard string) *corev1.ConfigMap {
+	return &corev1.ConfigMap{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       "ConfigMap",
+			APIVersion: "v1",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			GenerateName: "atlas-connection-cm-",
+			Namespace:    connection.Namespace,
+			Labels: map[string]string{
+				"managed-by":      "atlas-operator",
+				"owner":           connection.Name,
+				"owner.kind":      connection.Kind,
+				"owner.namespace": connection.Namespace,
+			},
+			OwnerReferences: []metav1.OwnerReference{
+				{
+					UID:                connection.GetUID(),
+					APIVersion:         "dbaas.redhat.com/v1alpha1",
+					BlockOwnerDeletion: ptr.BoolPtr(false),
+					Controller:         ptr.BoolPtr(true),
+					Kind:               "MongoDBAtlasConnection",
+					Name:               connection.Name,
+				},
+			},
+		},
+		Data: map[string]string{
+			dbaas.ConnectionStringsStandardSrvKey: connectionStringStandardSrv,
+			dbaas.ConnectionStringsStandardKey:    connectionStringStandard,
+		},
+	}
+}
+
 // getOwnedSecret returns a secret object for database credentials with ownership set
 func getOwnedSecret(connection *dbaas.MongoDBAtlasConnection, username, password string) *corev1.Secret {
 	return &corev1.Secret{
@@ -378,15 +414,6 @@ func getOwnedSecret(connection *dbaas.MongoDBAtlasConnection, username, password
 	}
 }
 
-// isInstanceIDChanged is instanceID in the spec of MongoDBAtlasConnection new or changed?
-func isInstanceIDChanged(conn *dbaas.MongoDBAtlasConnection) bool {
-	if instanceID, ok := conn.Status.ConnectionInfo[dbaas.InstanceIDKey]; ok {
-		return conn.Spec.InstanceID != instanceID
-	}
-	// instanceID has not been populated in Status.ConnectionInfo map
-	return true
-}
-
 // isReadyForBinding is the MongoDBAtlasConnection ready for binding already?
 func isReadyForBinding(conn *dbaas.MongoDBAtlasConnection) bool {
 	cond := dbaas.GetConnectionCondition(conn, string(status.MongoDBAtlasConnectionReadyType))
@@ -408,19 +435,6 @@ func getInstance(inventory *dbaas.MongoDBAtlasInventory, instanceID string) *dba
 		}
 	}
 	return nil
-}
-
-// getHost returns the database connection host
-func getHost(instance *dbaasv1alpha1.Instance) string {
-	connectionHost := ""
-	connStrTokens := strings.Split(instance.InstanceInfo[dbaas.ConnectionStringKey], "://")
-	if len(connStrTokens) < 2 {
-		//There is no "://" found
-		connectionHost = connStrTokens[0]
-	} else {
-		connectionHost = connStrTokens[1]
-	}
-	return connectionHost
 }
 
 // generatePassword generates a random password with at least one digit and one special character.

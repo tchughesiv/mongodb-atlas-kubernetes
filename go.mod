@@ -5,7 +5,7 @@ go 1.15
 require (
 	github.com/RHEcosystemAppEng/dbaas-operator v1.0.0
 	github.com/fatih/structtag v1.2.0
-	github.com/go-logr/logr v0.4.0 // indirect
+	github.com/go-logr/logr v0.4.0
 	github.com/go-logr/zapr v0.4.0
 	github.com/golang/snappy v0.0.2 // indirect
 	github.com/google/go-cmp v0.5.6
@@ -28,4 +28,4 @@ require (
 	sigs.k8s.io/controller-runtime v0.7.0
 )
 
-replace github.com/RHEcosystemAppEng/dbaas-operator v1.0.0 => github.com/RHEcosystemAppEng/dbaas-operator v1.0.1-0.20210616190557-f8ab366a6505
+replace github.com/RHEcosystemAppEng/dbaas-operator v1.0.0 => github.com/RHEcosystemAppEng/dbaas-operator v1.0.1-0.20210708173642-80dd8ca0903f

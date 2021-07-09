@@ -19,15 +19,14 @@ import (
 )
 
 const (
-	CloudProviderKey    = "providerName"
-	CloudRegionKey      = "regionName"
-	ProjectIDKey        = "projectID"
-	ProjectNameKey      = "projectName"
-	InstanceSizeNameKey = "instanceSizeName"
-	ConnectionStringKey = "connectionString"
-	InstanceIDKey       = "instanceID"
-
-	ServiceBindingProviderName = "MongoDB"
+	CloudProviderKey                = "providerName"
+	CloudRegionKey                  = "regionName"
+	ProjectIDKey                    = "projectID"
+	ProjectNameKey                  = "projectName"
+	InstanceSizeNameKey             = "instanceSizeName"
+	ConnectionStringsStandardSrvKey = "connectionStringsStandardSrv"
+	ConnectionStringsStandardKey    = "connectionStringsStandard"
+	InstanceIDKey                   = "instanceID"
 )
 
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
