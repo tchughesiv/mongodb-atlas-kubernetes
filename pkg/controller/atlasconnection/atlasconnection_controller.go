@@ -375,6 +375,8 @@ func getOwnedConfigMap(connection *dbaas.MongoDBAtlasConnection, connectionStrin
 			},
 		},
 		Data: map[string]string{
+			dbaas.ProviderKey:                     dbaas.Provider,
+			dbaas.ServiceBindingTypeKey:           dbaas.ServiceBindingType,
 			dbaas.ConnectionStringsStandardSrvKey: connectionStringStandardSrv,
 			dbaas.ConnectionStringsStandardKey:    connectionStringStandard,
 		},
