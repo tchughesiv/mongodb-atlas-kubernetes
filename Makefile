@@ -143,7 +143,7 @@ bundle: manifests kustomize ## Generate bundle manifests and metadata, update se
 	cd config/manager && $(KUSTOMIZE) edit set image controller=$(IMG)
 	$(KUSTOMIZE) build --load-restrictor LoadRestrictionsNone config/manifests | operator-sdk generate bundle -q --overwrite --version $(VERSION) $(BUNDLE_METADATA_OPTS)
 	sed -i .bak '/runAsNonRoot: true/d' "./bundle/manifests/mongodb-atlas-kubernetes.clusterserviceversion.yaml"
-	sed -i .bak '/runAsUser: 2000/d' "./bundle/manifests/mongodb-atlas-kubernetes.clusterserviceversion.yaml"
+	sed -i .bak '/runAsUser: 1000380001/d' "./bundle/manifests/mongodb-atlas-kubernetes.clusterserviceversion.yaml"
 	rm ./bundle/manifests/*.bak
 	operator-sdk bundle validate ./bundle
 
