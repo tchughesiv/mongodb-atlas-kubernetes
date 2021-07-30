@@ -22,10 +22,11 @@ require (
 	golang.org/x/sys v0.0.0-20210630005230-0f9fa26af87c // indirect
 	golang.org/x/tools v0.1.5 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
-	k8s.io/api v0.19.2
-	k8s.io/apimachinery v0.19.2
-	k8s.io/client-go v0.19.2
-	sigs.k8s.io/controller-runtime v0.7.0
+	k8s.io/api v0.20.2
+	k8s.io/apimachinery v0.20.2
+	k8s.io/client-go v0.20.2
+	k8s.io/utils v0.0.0-20210709001253-0e1f9d693477
+	sigs.k8s.io/controller-runtime v0.8.3
 )
 
-replace github.com/RHEcosystemAppEng/dbaas-operator v1.0.0 => github.com/RHEcosystemAppEng/dbaas-operator v1.0.1-0.20210708173642-80dd8ca0903f
+replace github.com/RHEcosystemAppEng/dbaas-operator v1.0.0 => github.com/RHEcosystemAppEng/dbaas-operator v1.0.1-0.20210728155403-fcf7cfba855c

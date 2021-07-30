@@ -26,13 +26,13 @@ import (
 
 var (
 	// GroupVersion is group version used to register these objects
-	DBaaSGroupVersion = schema.GroupVersion{Group: "dbaas.redhat.com", Version: "v1alpha1"}
+	GroupVersion = schema.GroupVersion{Group: "dbaas.redhat.com", Version: "v1alpha1"}
 
 	// SchemeBuilder is used to add go types to the GroupVersionKind scheme
-	DBaaSSchemeBuilder = &scheme.Builder{GroupVersion: DBaaSGroupVersion}
+	SchemeBuilder = &scheme.Builder{GroupVersion: GroupVersion}
 
 	// AddToScheme adds the types in this group-version to the given scheme.
-	AddToScheme = DBaaSSchemeBuilder.AddToScheme
+	AddToScheme = SchemeBuilder.AddToScheme
 
 	_ = &MongoDBAtlasInventory{}
 

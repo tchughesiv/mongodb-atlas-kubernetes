@@ -60,7 +60,7 @@ type MongoDBAtlasConnectionList struct {
 }
 
 func init() {
-	DBaaSSchemeBuilder.Register(&MongoDBAtlasConnection{}, &MongoDBAtlasConnectionList{})
+	SchemeBuilder.Register(&MongoDBAtlasConnection{}, &MongoDBAtlasConnectionList{})
 }
 
 // SetConnectionCondition sets a condition on the status object. If the condition already

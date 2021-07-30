@@ -34,6 +34,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	ctrzap "sigs.k8s.io/controller-runtime/pkg/log/zap"
 
+	dbaasv1alpha1 "github.com/RHEcosystemAppEng/dbaas-operator/api/v1alpha1"
 	"github.com/mongodb/mongodb-atlas-kubernetes/pkg/api/dbaas"
 	mdbv1 "github.com/mongodb/mongodb-atlas-kubernetes/pkg/api/v1"
 	"github.com/mongodb/mongodb-atlas-kubernetes/pkg/controller/atlas"
@@ -42,7 +43,7 @@ import (
 	"github.com/mongodb/mongodb-atlas-kubernetes/pkg/controller/atlasdatabaseuser"
 	"github.com/mongodb/mongodb-atlas-kubernetes/pkg/controller/atlasinventory"
 	"github.com/mongodb/mongodb-atlas-kubernetes/pkg/controller/atlasproject"
-	"github.com/mongodb/mongodb-atlas-kubernetes/pkg/controller/dbaasregistration"
+	"github.com/mongodb/mongodb-atlas-kubernetes/pkg/controller/dbaasprovider"
 	"github.com/mongodb/mongodb-atlas-kubernetes/pkg/controller/watch"
 	"github.com/mongodb/mongodb-atlas-kubernetes/pkg/util/kube"
 	// +kubebuilder:scaffold:imports
@@ -62,6 +63,8 @@ func init() {
 	utilruntime.Must(mdbv1.AddToScheme(scheme))
 
 	utilruntime.Must(dbaas.AddToScheme(scheme))
+
+	utilruntime.Must(dbaasv1alpha1.AddToScheme(scheme))
 
 	// +kubebuilder:scaffold:scheme
 
@@ -97,6 +100,23 @@ func main() {
 		os.Exit(1)
 	}
 
+	cfg := mgr.GetConfig()
+	clientset, err := kubernetes.NewForConfig(cfg)
+	if err != nil {
+		setupLog.Error(err, "unable to create clientset")
+		os.Exit(1)
+	}
+
+	if err = (&dbaasprovider.DBaaSProviderReconciler{
+		Client:    mgr.GetClient(),
+		Scheme:    mgr.GetScheme(),
+		Log:       setupLog,
+		Clientset: clientset,
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "DBaaSProvider")
+		os.Exit(1)
+	}
+
 	if err = (&atlasinventory.MongoDBAtlasInventoryReconciler{
 		Client:          mgr.GetClient(),
 		Log:             logger.Named("controllers").Named("MongoDBAtlasInventory").Sugar(),
@@ -109,20 +129,6 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "MongoDBAtlasInventory")
 		os.Exit(1)
 	}
-
-	cfg := mgr.GetConfig()
-	clientset, err := kubernetes.NewForConfig(cfg)
-	if err != nil {
-		setupLog.Error(err, "unable to create clientset")
-		os.Exit(1)
-	}
-	if err := dbaasregistration.CreateAtlasRegistrationConfigMap(clientset, setupLog); err != nil {
-		setupLog.Error(err, "unable to create Provider Registration ConfigMap")
-		os.Exit(1)
-	}
-
-	//Clean up the registration configmap when the Atlas Operator terminates
-	defer dbaasregistration.CleanupAtlasRegistrationConfigMap(clientset, setupLog)
 
 	if err = (&atlasconnection.MongoDBAtlasConnectionReconciler{
 		Client:          mgr.GetClient(),

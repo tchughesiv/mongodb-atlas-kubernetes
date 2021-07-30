@@ -46,7 +46,7 @@ type MongoDBAtlasInventoryList struct {
 }
 
 func init() {
-	DBaaSSchemeBuilder.Register(&MongoDBAtlasInventory{}, &MongoDBAtlasInventoryList{})
+	SchemeBuilder.Register(&MongoDBAtlasInventory{}, &MongoDBAtlasInventoryList{})
 }
 
 func (p *MongoDBAtlasInventory) ConnectionSecretObjectKey() *client.ObjectKey {

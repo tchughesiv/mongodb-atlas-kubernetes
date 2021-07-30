@@ -248,34 +248,6 @@ spec:
       - rules:
         - apiGroups:
           - ""
-          resourceNames:
-          - mongodb-atlas-registration
-          resources:
-          - configmaps
-          verbs:
-          - create
-          - delete
-          - get
-          - list
-          - patch
-          - update
-          - watch
-        - apiGroups:
-          - ""
-          resources:
-          - events
-          verbs:
-          - create
-          - patch
-        - apiGroups:
-          - ""
-          resources:
-          - namespaces
-          verbs:
-          - get
-          - list
-        - apiGroups:
-          - ""
           resources:
           - events
           verbs:
@@ -291,6 +263,24 @@ spec:
           - get
           - list
           - patch
+          - update
+          - watch
+        - apiGroups:
+          - apps
+          resources:
+          - events
+          verbs:
+          - create
+          - patch
+        - apiGroups:
+          - ""
+          resources:
+          - secrets
+          verbs:
+          - create
+          - delete
+          - get
+          - list
           - update
           - watch
         - apiGroups:
@@ -349,6 +339,26 @@ spec:
           - atlas.mongodb.com
           resources:
           - atlasprojects/status
+          verbs:
+          - get
+          - patch
+          - update
+        - apiGroups:
+          - dbaas.redhat.com
+          resources:
+          - dbaasproviders
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - dbaas.redhat.com
+          resources:
+          - dbaasproviders/status
           verbs:
           - get
           - patch
