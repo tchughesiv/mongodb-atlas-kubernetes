@@ -108,7 +108,12 @@ func (r *MongoDBAtlasConnectionReconciler) Reconcile(cx context.Context, req ctr
 	}(conn)
 
 	inventory := &dbaas.MongoDBAtlasInventory{}
-	if err := r.Client.Get(cx, types.NamespacedName{Namespace: req.Namespace, Name: conn.Spec.InventoryRef.Name}, inventory); err != nil {
+	namespace := conn.Spec.InventoryRef.Namespace
+	if len(namespace) == 0 {
+		//Namespace is not populated in InventoryRef, default to the request's namespace
+		namespace = req.Namespace
+	}
+	if err := r.Client.Get(cx, types.NamespacedName{Namespace: namespace, Name: conn.Spec.InventoryRef.Name}, inventory); err != nil {
 		if errors.IsNotFound(err) {
 			// CR deleted since request queued, child objects getting GC'd, no requeue
 			log.Info("MongoDBAtlasInventory resource not found, has been deleted")
