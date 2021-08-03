@@ -18,6 +18,7 @@ package atlasconnection
 
 import (
 	"context"
+	"strings"
 
 	"fmt"
 	"math/rand"
@@ -352,6 +353,18 @@ func (r *MongoDBAtlasConnectionReconciler) deleteDBUserFromAtlas(conn *dbaas.Mon
 	return nil
 }
 
+// getHost retrieves host from the standard srv connection string
+func getHost(connectionStringStandardSrv string) string {
+	tokens := strings.Split(connectionStringStandardSrv, "//")
+	var host string
+	if len(tokens) < 2 {
+		host = connectionStringStandardSrv
+	} else {
+		host = tokens[1]
+	}
+	return host
+}
+
 // getOwnedConfigMap returns a configmap object with ownership set
 func getOwnedConfigMap(connection *dbaas.MongoDBAtlasConnection, connectionStringStandardSrv, connectionStringStandard string) *corev1.ConfigMap {
 	return &corev1.ConfigMap{
@@ -384,6 +397,7 @@ func getOwnedConfigMap(connection *dbaas.MongoDBAtlasConnection, connectionStrin
 			dbaas.ServiceBindingTypeKey:           dbaas.ServiceBindingType,
 			dbaas.ConnectionStringsStandardSrvKey: connectionStringStandardSrv,
 			dbaas.ConnectionStringsStandardKey:    connectionStringStandard,
+			dbaas.HostKey:                         getHost(connectionStringStandardSrv),
 		},
 	}
 }

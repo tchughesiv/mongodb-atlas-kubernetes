@@ -65,12 +65,14 @@ metadata:
           "apiVersion": "dbaas.redhat.com/v1alpha1",
           "kind": "MongoDBAtlasConnection",
           "metadata": {
-            "name": "test-connection"
+            "name": "test-connection",
+            "namespace": "my-namespace"
           },
           "spec": {
             "instanceID": "606b2ffbc9a90e310e642482",
-            "inventory": {
-              "name": "test-inventory"
+            "inventoryRef": {
+              "name": "test-inventory",
+              "namespace": "mongodb-atlas-system"
             }
           }
         },
@@ -84,9 +86,6 @@ metadata:
             "credentialsRef": {
               "name": "my-atlas-key",
               "namespace": "mongodb-atlas-system"
-            },
-            "provider": {
-              "name": "mongodbatlas"
             }
           }
         }

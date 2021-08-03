@@ -27,6 +27,7 @@ const (
 	ConnectionStringsStandardSrvKey = "connectionStringsStandardSrv"
 	ConnectionStringsStandardKey    = "connectionStringsStandard"
 	InstanceIDKey                   = "instanceID"
+	HostKey                         = "host"
 	ProviderKey                     = "provider"
 	Provider                        = "Red Hat DBaaS / MongoDB Atlas"
 	ServiceBindingTypeKey           = "type"
