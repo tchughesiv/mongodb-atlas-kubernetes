@@ -1,0 +1,54 @@
+/Users/zhangj/devt/src/mongodb-atlas-kubernetes/bin/controller-gen object:headerFile="hack/boilerplate.go.txt" paths="./..."
+CGO_ENABLED=0 go test ./pkg/controller/atlasconnection/... ./pkg/controller/atlasinventory/... ./pkg/controller/dbaasprovider/... -v
+=== RUN   TestAtlasConnectionReconcile
+=== RUN   TestAtlasConnectionReconcile/Nominal
+=== RUN   TestAtlasConnectionReconcile/ConnectionCRNotFound
+=== RUN   TestAtlasConnectionReconcile/InstanceIDNotFound
+=== RUN   TestAtlasConnectionReconcile/InventoryNotFound
+=== RUN   TestAtlasConnectionReconcile/ConfigMapCreateFail
+=== RUN   TestAtlasConnectionReconcile/SecretCreateFail
+=== RUN   TestAtlasConnectionReconcile/AtlasDBUserCreateFail
+--- PASS: TestAtlasConnectionReconcile (0.01s)
+    --- PASS: TestAtlasConnectionReconcile/Nominal (0.00s)
+    --- PASS: TestAtlasConnectionReconcile/ConnectionCRNotFound (0.00s)
+    --- PASS: TestAtlasConnectionReconcile/InstanceIDNotFound (0.00s)
+    --- PASS: TestAtlasConnectionReconcile/InventoryNotFound (0.00s)
+    --- PASS: TestAtlasConnectionReconcile/ConfigMapCreateFail (0.00s)
+    --- PASS: TestAtlasConnectionReconcile/SecretCreateFail (0.00s)
+    --- PASS: TestAtlasConnectionReconcile/AtlasDBUserCreateFail (0.00s)
+=== RUN   TestDBUserDelete
+=== RUN   TestDBUserDelete/Nominal
+=== RUN   TestDBUserDelete/InstanceIDNotFound
+=== RUN   TestDBUserDelete/InventoryNotFound
+=== RUN   TestDBUserDelete/AtlasDBUserDeleteFail
+--- PASS: TestDBUserDelete (0.00s)
+    --- PASS: TestDBUserDelete/Nominal (0.00s)
+    --- PASS: TestDBUserDelete/InstanceIDNotFound (0.00s)
+    --- PASS: TestDBUserDelete/InventoryNotFound (0.00s)
+    --- PASS: TestDBUserDelete/AtlasDBUserDeleteFail (0.00s)
+PASS
+ok  	github.com/mongodb/mongodb-atlas-kubernetes/pkg/controller/atlasconnection	(cached)
+=== RUN   TestDiscoverInstances
+--- PASS: TestDiscoverInstances (0.00s)
+=== RUN   TestAtlasInventoryReconcile
+=== RUN   TestAtlasInventoryReconcile/InventoryCRNotFound
+=== RUN   TestAtlasInventoryReconcile/SecretNotFound
+=== RUN   TestAtlasInventoryReconcile/NoCredentialRef
+=== RUN   TestAtlasInventoryReconcile/Nominal
+--- PASS: TestAtlasInventoryReconcile (0.00s)
+    --- PASS: TestAtlasInventoryReconcile/InventoryCRNotFound (0.00s)
+    --- PASS: TestAtlasInventoryReconcile/SecretNotFound (0.00s)
+    --- PASS: TestAtlasInventoryReconcile/NoCredentialRef (0.00s)
+    --- PASS: TestAtlasInventoryReconcile/Nominal (0.00s)
+PASS
+ok  	github.com/mongodb/mongodb-atlas-kubernetes/pkg/controller/atlasinventory	(cached)
+=== RUN   TestDBaaSProviderCreate
+=== RUN   TestDBaaSProviderCreate/Nominal
+=== RUN   TestDBaaSProviderCreate/CRDCheckFail
+=== RUN   TestDBaaSProviderCreate/CRDCheckNotFound
+--- PASS: TestDBaaSProviderCreate (0.01s)
+    --- PASS: TestDBaaSProviderCreate/Nominal (0.01s)
+    --- PASS: TestDBaaSProviderCreate/CRDCheckFail (0.00s)
+    --- PASS: TestDBaaSProviderCreate/CRDCheckNotFound (0.00s)
+PASS
+ok  	github.com/mongodb/mongodb-atlas-kubernetes/pkg/controller/dbaasprovider	(cached)

@@ -60,8 +60,9 @@ const (
 
 // MongoDBAtlasConnectionReconciler reconciles a MongoDBAtlasConnection object
 type MongoDBAtlasConnectionReconciler struct {
-	Client    client.Client
-	Clientset *kubernetes.Clientset
+	Client      client.Client
+	Clientset   kubernetes.Interface
+	AtlasClient *mongodbatlas.Client
 	watch.ResourceWatcher
 	Log             *zap.SugaredLogger
 	Scheme          *runtime.Scheme
@@ -116,8 +117,10 @@ func (r *MongoDBAtlasConnectionReconciler) Reconcile(cx context.Context, req ctr
 	}
 	if err := r.Client.Get(cx, types.NamespacedName{Namespace: namespace, Name: conn.Spec.InventoryRef.Name}, inventory); err != nil {
 		if errors.IsNotFound(err) {
-			// CR deleted since request queued, child objects getting GC'd, no requeue
+			// The corresponding inventory is not found, no reqeue.
 			log.Info("MongoDBAtlasInventory resource not found, has been deleted")
+			result := workflow.InProgress(workflow.MongoDBAtlasConnectionInventoryNotFound, "inventory not found")
+			dbaas.SetConnectionCondition(conn, string(status.MongoDBAtlasConnectionReadyType), metav1.ConditionFalse, string(result.Reason()), result.Message())
 			return ctrl.Result{}, nil
 		}
 		log.Error(err, "Error fetching MongoDBAtlasInventory")
@@ -135,7 +138,7 @@ func (r *MongoDBAtlasConnectionReconciler) Reconcile(cx context.Context, req ctr
 	// Retrieve the instance from inventory based on instanceID
 	instance := getInstance(inventory, conn.Spec.InstanceID)
 	if instance == nil {
-		result := workflow.Terminate(workflow.MongoDBAtlasConnectionNotFound, "Atlas database instance not found")
+		result := workflow.Terminate(workflow.MongoDBAtlasConnectionInstanceIDNotFound, "Atlas database instance not found")
 		dbaas.SetConnectionCondition(conn, string(status.MongoDBAtlasConnectionReadyType), metav1.ConditionFalse, string(result.Reason()), result.Message())
 		// No further reconciliation needed
 		return result.ReconcileResult(), nil
@@ -149,7 +152,7 @@ func (r *MongoDBAtlasConnectionReconciler) Reconcile(cx context.Context, req ctr
 	if err != nil {
 		result := workflow.Terminate(workflow.MongoDBAtlasConnectionBackendError, err.Error())
 		dbaas.SetConnectionCondition(conn, string(status.MongoDBAtlasConnectionReadyType), metav1.ConditionFalse, string(result.Reason()), result.Message())
-		return ctrl.Result{}, err
+		return ctrl.Result{}, fmt.Errorf("failed to create configmap:%v", err)
 	}
 
 	// Generate a db username and password
@@ -169,7 +172,7 @@ func (r *MongoDBAtlasConnectionReconciler) Reconcile(cx context.Context, req ctr
 		r.deleteDBUserFromAtlas(conn, instance.InstanceInfo[dbaas.ProjectIDKey], dbUserName, inventory, log)
 		result := workflow.Terminate(workflow.MongoDBAtlasConnectionBackendError, err.Error())
 		dbaas.SetConnectionCondition(conn, string(status.MongoDBAtlasConnectionReadyType), metav1.ConditionFalse, string(result.Reason()), result.Message())
-		return ctrl.Result{}, err
+		return ctrl.Result{}, fmt.Errorf("failed to create secret:%v", err)
 	}
 
 	// Update the status
@@ -213,6 +216,10 @@ func (r *MongoDBAtlasConnectionReconciler) Delete(e event.DeleteEvent) error {
 }
 
 func (r *MongoDBAtlasConnectionReconciler) deleteDBUser(conn *dbaas.MongoDBAtlasConnection, log *zap.SugaredLogger) error {
+	if conn.Status.CredentialsRef == nil {
+		log.Infow("No credentialsRef provided. Nothing to delete.")
+		return nil
+	}
 	secret, err := r.getSecret(conn.Namespace, conn.Status.CredentialsRef.Name)
 	if err != nil {
 		if errors.IsNotFound(err) {
@@ -246,7 +253,7 @@ func (r *MongoDBAtlasConnectionReconciler) deleteDBUser(conn *dbaas.MongoDBAtlas
 	}
 
 	if !isInventoryReady(inventory) {
-		//The corresponding inventory is not ready yet, requeue
+		//The corresponding inventory is not ready yet
 		//Nothing to clean up
 		return nil
 	}
@@ -301,11 +308,16 @@ func (r *MongoDBAtlasConnectionReconciler) createDBUserInAtlas(conn *dbaas.Mongo
 		dbaas.SetConnectionCondition(conn, string(status.MongoDBAtlasConnectionReadyType), metav1.ConditionFalse, string(result.Reason()), result.Message())
 		return result.ReconcileResult(), err
 	}
-	atlasClient, err := atlas.Client(r.AtlasDomain, atlasConnection, log)
-	if err != nil {
-		result := workflow.Terminate(workflow.MongoDBAtlasConnectionBackendError, err.Error())
-		dbaas.SetConnectionCondition(conn, string(status.MongoDBAtlasConnectionReadyType), metav1.ConditionFalse, string(result.Reason()), result.Message())
-		return result.ReconcileResult(), err
+
+	atlasClient := r.AtlasClient
+	if atlasClient == nil {
+		cl, err := atlas.Client(r.AtlasDomain, atlasConnection, log)
+		if err != nil {
+			result := workflow.Terminate(workflow.MongoDBAtlasConnectionBackendError, err.Error())
+			dbaas.SetInventoryCondition(inventory, string(status.MongoDBAtlasConnectionReadyType), metav1.ConditionFalse, string(result.Reason()), result.Message())
+			return result.ReconcileResult(), nil
+		}
+		atlasClient = &cl
 	}
 
 	// Try to create the db user
@@ -324,32 +336,20 @@ func (r *MongoDBAtlasConnectionReconciler) deleteDBUserFromAtlas(conn *dbaas.Mon
 		return err
 	}
 
-	atlasClient, err := atlas.Client(r.AtlasDomain, atlasConnection, log)
-	if err != nil {
-		return fmt.Errorf("cannot build Atlas client: %w", err)
+	atlasClient := r.AtlasClient
+	if atlasClient == nil {
+		cl, err := atlas.Client(r.AtlasDomain, atlasConnection, log)
+		if err != nil {
+			return fmt.Errorf("cannot build Atlas client: %w", err)
+		}
+		atlasClient = &cl
 	}
 
-	go func() {
-		timeout := time.Now().Add(workflow.DefaultTimeout)
-		for time.Now().Before(timeout) {
-			_, err = atlasClient.DatabaseUsers.Delete(context.Background(), "admin", projectID, dbUserName)
-			if errors.IsNotFound(err) {
-				log.Info("Database user doesn't exist or is already deleted")
-				return
-			}
-
-			if err != nil {
-				log.Errorw("Cannot delete Atlas database ser", "error", err)
-				time.Sleep(workflow.DefaultRetry)
-				continue
-			}
-
-			log.Info("Started Atlas database deletion process")
-			return
-		}
-
-		log.Error("Failed to delete Atlas database user in time")
-	}()
+	_, err = atlasClient.DatabaseUsers.Delete(context.Background(), "admin", projectID, dbUserName)
+	if err != nil {
+		log.Errorw("Cannot delete Atlas database user", "error", err)
+		return fmt.Errorf("failed to delete Atlas database user %s: %v", dbUserName, err)
+	}
 	return nil
 }
 

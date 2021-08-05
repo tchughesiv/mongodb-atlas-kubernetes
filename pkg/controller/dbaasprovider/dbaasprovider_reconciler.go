@@ -21,13 +21,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-
-	dbaasoperator "github.com/RHEcosystemAppEng/dbaas-operator/api/v1alpha1"
-	"github.com/go-logr/logr"
-
 	"os"
 	"time"
 
+	dbaasoperator "github.com/RHEcosystemAppEng/dbaas-operator/api/v1alpha1"
+	"go.uber.org/zap"
 	v1 "k8s.io/api/apps/v1"
 	rbac "k8s.io/api/rbac/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -55,11 +53,12 @@ const (
 type DBaaSProviderReconciler struct {
 	client.Client
 	*runtime.Scheme
-	Log                      logr.Logger
-	Clientset                *kubernetes.Clientset
+	Log                      *zap.SugaredLogger
+	Clientset                kubernetes.Interface
 	operatorNameVersion      string
 	operatorInstallNamespace string
 	providerFile             string
+	cdrChecker               func(groupVersion, kind string) (bool, error)
 }
 
 // +kubebuilder:rbac:groups=apps,resources=deployments,verbs=get;list;create;update;delete;watch
@@ -68,7 +67,7 @@ type DBaaSProviderReconciler struct {
 
 func (r *DBaaSProviderReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 
-	log := r.Log.WithValues("during", "DBaaSProvider Reconciler")
+	log := r.Log.With("DBaaSProvider Reconciler", req.NamespacedName)
 
 	// due to predicate filtering, we'll only reconcile this operator's own deployment when it's seen the first time
 	// meaning we have a reconcile entry-point on operator start-up, so now we can create a cluster-scoped resource
@@ -86,7 +85,10 @@ func (r *DBaaSProviderReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 		return ctrl.Result{}, err
 	}
 
-	isCrdInstalled, err := r.checkCrdInstalled(dbaasoperator.GroupVersion.String(), dbaasProviderKind)
+	if r.cdrChecker == nil {
+		r.cdrChecker = r.checkCrdInstalled
+	}
+	isCrdInstalled, err := r.cdrChecker(dbaasoperator.GroupVersion.String(), dbaasProviderKind)
 	if err != nil {
 		log.Error(err, "error discovering GVK")
 		return ctrl.Result{}, err
@@ -181,7 +183,7 @@ func (r *DBaaSProviderReconciler) checkCrdInstalled(groupVersion, kind string) (
 		if errors.IsNotFound(err) {
 			return false, nil
 		}
-		return false, err
+		return false, fmt.Errorf("failed to check DBaaSProvider CRD:%v", err)
 	}
 	for _, r := range resources.APIResources {
 		if r.Kind == kind {
@@ -193,7 +195,7 @@ func (r *DBaaSProviderReconciler) checkCrdInstalled(groupVersion, kind string) (
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *DBaaSProviderReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	log := r.Log.WithValues("during", "DBaaSProviderReconciler setup")
+	log := r.Log.With("DBaaSProviderReconciler setup")
 
 	// envVar set in controller-manager's Deployment YAML
 	if operatorInstallNamespace, found := os.LookupEnv("OPERATOR_NAMESPACE"); !found {

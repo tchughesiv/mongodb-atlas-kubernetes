@@ -36,11 +36,13 @@ import (
 	"github.com/mongodb/mongodb-atlas-kubernetes/pkg/controller/atlas"
 	"github.com/mongodb/mongodb-atlas-kubernetes/pkg/controller/watch"
 	"github.com/mongodb/mongodb-atlas-kubernetes/pkg/controller/workflow"
+	"go.mongodb.org/atlas/mongodbatlas"
 )
 
 // MongoDBAtlasInventoryReconciler reconciles a MongoDBAtlasInventory object
 type MongoDBAtlasInventoryReconciler struct {
-	Client client.Client
+	Client      client.Client
+	AtlasClient *mongodbatlas.Client
 	watch.ResourceWatcher
 	Log             *zap.SugaredLogger
 	Scheme          *runtime.Scheme
@@ -101,13 +103,17 @@ func (r *MongoDBAtlasInventoryReconciler) Reconcile(ctx context.Context, req ctr
 		dbaas.SetInventoryCondition(inventory, string(status.MongoDBAtlasInventoryReadyType), metav1.ConditionFalse, string(result.Reason()), result.Message())
 		return result.ReconcileResult(), nil
 	}
-	atlasClient, err := atlas.Client(r.AtlasDomain, atlasConn, log)
-	if err != nil {
-		result := workflow.Terminate(workflow.MongoDBAtlasConnectionBackendError, err.Error())
-		dbaas.SetInventoryCondition(inventory, string(status.MongoDBAtlasInventoryReadyType), metav1.ConditionFalse, string(result.Reason()), result.Message())
-		return result.ReconcileResult(), nil
+	atlasClient := r.AtlasClient
+	if atlasClient == nil {
+		cl, err := atlas.Client(r.AtlasDomain, atlasConn, log)
+		if err != nil {
+			result := workflow.Terminate(workflow.MongoDBAtlasConnectionBackendError, err.Error())
+			dbaas.SetInventoryCondition(inventory, string(status.MongoDBAtlasInventoryReadyType), metav1.ConditionFalse, string(result.Reason()), result.Message())
+			return result.ReconcileResult(), nil
+		}
+		atlasClient = &cl
 	}
-	inventoryList, result := discoverInstances(&atlasClient)
+	inventoryList, result := discoverInstances(atlasClient)
 	if !result.IsOk() {
 		dbaas.SetInventoryCondition(inventory, string(status.MongoDBAtlasInventoryReadyType), metav1.ConditionFalse, string(result.Reason()), result.Message())
 		return result.ReconcileResult(), nil

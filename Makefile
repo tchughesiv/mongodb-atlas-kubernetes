@@ -217,3 +217,6 @@ catalog-build: opm ## Build a catalog image.
 .PHONY: catalog-push
 catalog-push: ## Push a catalog image.
 	$(MAKE) docker-push IMG=$(CATALOG_IMG)
+
+go-test-dbaas: ## Run unit test for AtlasConnection, AtlasInventory and DBaaSProvider controllers
+	CGO_ENABLED=0 go test ./pkg/controller/atlasconnection/... ./pkg/controller/atlasinventory/... ./pkg/controller/dbaasprovider/...

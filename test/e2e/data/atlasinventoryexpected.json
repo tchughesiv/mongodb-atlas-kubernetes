@@ -1,0 +1,28 @@
+[
+    {
+       "instanceID":"70b7a72f4877d05880c487ef",
+       "name":"testb",
+       "instanceInfo":{
+          "connectionStringsStandard":"mongodb://testb-shard-00-00.fbbz5.mongodb.net:27017,testb-shard-00-01.fbbz5.mongodb.net:27017,testb-shard-00-02.fbbz5.mongodb.net:27017/?ssl=true\u0026authSource=admin\u0026replicaSet=atlas-eituqf-shard-0",
+          "connectionStringsStandardSrv":"mongodb+srv://testb.fbbz5.mongodb.net",
+          "instanceSizeName":"M10",
+          "projectID":"608df5e652e1944293e8584a",
+          "projectName":"Project 1",
+          "providerName":"AWS",
+          "regionName":"US_EAST_1"
+       }
+    },
+    {
+       "instanceID":"60b7a72f4877d05880c487d2",
+       "name":"testa",
+       "instanceInfo":{
+          "connectionStringsStandard":"mongodb://testa-shard-00-00.fbbz6.mongodb.net:27017,testa-shard-00-01.fbbz6.mongodb.net:27017,testa-shard-00-02.fbbz6.mongodb.net:27017/?ssl=true\u0026authSource=admin\u0026replicaSet=atlas-eituqf-shard-0",
+          "connectionStringsStandardSrv":"mongodb+srv://testa.fbbz6.mongodb.net",
+          "instanceSizeName":"M10",
+          "projectID":"60b798fea37f9f09acc1a154",
+          "projectName":"Project 2",
+          "providerName":"AWS",
+          "regionName":"US_EAST_1"
+       }
+    }
+ ]

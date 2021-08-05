@@ -110,7 +110,7 @@ func main() {
 	if err = (&dbaasprovider.DBaaSProviderReconciler{
 		Client:    mgr.GetClient(),
 		Scheme:    mgr.GetScheme(),
-		Log:       setupLog,
+		Log:       logger.Named("controllers").Named("DBaaSProvider").Sugar(),
 		Clientset: clientset,
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "DBaaSProvider")

@@ -21,6 +21,7 @@ package dbaas
 
 import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/client-go/kubernetes"
 	"sigs.k8s.io/controller-runtime/pkg/scheme"
 )
 
@@ -34,3 +35,7 @@ var (
 	// AddToScheme adds the types in this group-version to the given scheme.
 	AddToScheme = SchemeBuilder.AddToScheme
 )
+
+type k8s struct {
+	clientset kubernetes.Interface
+}
