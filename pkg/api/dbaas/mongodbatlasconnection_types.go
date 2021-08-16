@@ -28,10 +28,12 @@ const (
 	ConnectionStringsStandardKey    = "connectionStringsStandard"
 	InstanceIDKey                   = "instanceID"
 	HostKey                         = "host"
+	SrvKey                          = "srv"
 	ProviderKey                     = "provider"
 	Provider                        = "Red Hat DBaaS / MongoDB Atlas"
 	ServiceBindingTypeKey           = "type"
-	ServiceBindingType              = "MongoDB"
+	ServiceBindingType              = "mongodb"
+	DefaultDatabase                 = "admin"
 )
 
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.

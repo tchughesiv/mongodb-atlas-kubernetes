@@ -290,11 +290,11 @@ func (r *MongoDBAtlasConnectionReconciler) getSecret(namespace, name string) (*c
 //createDBUserInAtlas create the database user in Atlas
 func (r *MongoDBAtlasConnectionReconciler) createDBUserInAtlas(conn *dbaas.MongoDBAtlasConnection, projectID, dbUserName, dbPassword string, inventory *dbaas.MongoDBAtlasInventory, log *zap.SugaredLogger) (ctrl.Result, error) {
 	dbUser := &mongodbatlas.DatabaseUser{
-		DatabaseName: "admin",
+		DatabaseName: dbaas.DefaultDatabase,
 		GroupID:      projectID,
 		Roles: []mongodbatlas.Role{
 			{
-				DatabaseName: "admin",
+				DatabaseName: dbaas.DefaultDatabase,
 				RoleName:     "readWriteAnyDatabase",
 			},
 		},
@@ -393,11 +393,10 @@ func getOwnedConfigMap(connection *dbaas.MongoDBAtlasConnection, connectionStrin
 			},
 		},
 		Data: map[string]string{
-			dbaas.ProviderKey:                     dbaas.Provider,
-			dbaas.ServiceBindingTypeKey:           dbaas.ServiceBindingType,
-			dbaas.ConnectionStringsStandardSrvKey: connectionStringStandardSrv,
-			dbaas.ConnectionStringsStandardKey:    connectionStringStandard,
-			dbaas.HostKey:                         getHost(connectionStringStandardSrv),
+			dbaas.ProviderKey:           dbaas.Provider,
+			dbaas.ServiceBindingTypeKey: dbaas.ServiceBindingType,
+			dbaas.HostKey:               getHost(connectionStringStandardSrv),
+			dbaas.SrvKey:                "true",
 		},
 	}
 }
