@@ -465,7 +465,7 @@ spec:
                         valueFrom:
                           fieldRef:
                             fieldPath: metadata.annotations['olm.targetNamespaces']
-                    image: mongodb/mongodb-atlas-kubernetes-operator:1.7.0
+                    image: registry.connect.redhat.com/mongodb/mongodb-atlas-kubernetes-operator:1.0.0
                     imagePullPolicy: Always
                     livenessProbe:
                       httpGet:
