@@ -14,6 +14,9 @@ import (
 )
 
 const (
+	VendorKey = "type"
+	VendorVal = "dbaas-vendor-credentials"
+
 	ProjectLabelKey string = "atlas.mongodb.com/project-id"
 	ClusterLabelKey string = "atlas.mongodb.com/cluster-name"
 
@@ -59,7 +62,7 @@ func fillSecret(secret *corev1.Secret, projectID string, clusterName string, dat
 		return err
 	}
 
-	secret.Labels = map[string]string{ProjectLabelKey: projectID, ClusterLabelKey: kube.NormalizeLabelValue(clusterName)}
+	secret.Labels = map[string]string{VendorKey: VendorVal, ProjectLabelKey: projectID, ClusterLabelKey: kube.NormalizeLabelValue(clusterName)}
 
 	secret.Data = map[string][]byte{
 		connectionSecretStdKey:    []byte(connURL),

@@ -92,6 +92,7 @@ func validateSecret(t *testing.T, fakeClient client.Client, namespace, projectNa
 	expectedLabels := map[string]string{
 		"atlas.mongodb.com/project-id":   projectID,
 		"atlas.mongodb.com/cluster-name": clusterName,
+		VendorKey:                        VendorVal,
 	}
 	assert.Equal(t, expectedData, secret.Data)
 	assert.Equal(t, expectedLabels, secret.Labels)

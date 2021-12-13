@@ -195,12 +195,9 @@ func (r *DBaaSProviderReconciler) checkCrdInstalled(groupVersion, kind string) (
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *DBaaSProviderReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	log := r.Log.With("DBaaSProviderReconciler setup")
-
 	// envVar set in controller-manager's Deployment YAML
 	if operatorInstallNamespace, found := os.LookupEnv("OPERATOR_NAMESPACE"); !found {
 		err := errors.New("OPERATOR_NAMESPACE must be set")
-		log.Error(err, "error fetching envVar")
 		return err
 	} else {
 		r.operatorInstallNamespace = operatorInstallNamespace
@@ -209,7 +206,6 @@ func (r *DBaaSProviderReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	// envVar set for all operators
 	if operatorNameEnvVar, found := os.LookupEnv("OPERATOR_CONDITION_NAME"); !found {
 		err := errors.New("OPERATOR_CONDITION_NAME must be set")
-		log.Error(err, "error fetching envVar")
 		return err
 	} else {
 		r.operatorNameVersion = operatorNameEnvVar

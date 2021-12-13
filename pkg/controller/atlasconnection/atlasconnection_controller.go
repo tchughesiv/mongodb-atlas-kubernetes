@@ -49,6 +49,7 @@ import (
 	"github.com/mongodb/mongodb-atlas-kubernetes/pkg/api/dbaas"
 	"github.com/mongodb/mongodb-atlas-kubernetes/pkg/api/v1/status"
 	"github.com/mongodb/mongodb-atlas-kubernetes/pkg/controller/atlas"
+	"github.com/mongodb/mongodb-atlas-kubernetes/pkg/controller/connectionsecret"
 	"github.com/mongodb/mongodb-atlas-kubernetes/pkg/controller/watch"
 	"github.com/mongodb/mongodb-atlas-kubernetes/pkg/controller/workflow"
 	"github.com/mongodb/mongodb-atlas-kubernetes/pkg/util/kube"
@@ -380,10 +381,10 @@ func getOwnedConfigMap(connection *dbaas.MongoDBAtlasConnection, connectionStrin
 			GenerateName: "atlas-connection-cm-",
 			Namespace:    connection.Namespace,
 			Labels: map[string]string{
-				"managed-by":      "atlas-operator",
-				"owner":           connection.Name,
-				"owner.kind":      connection.Kind,
-				"owner.namespace": connection.Namespace,
+				connectionsecret.VendorKey: connectionsecret.VendorVal,
+				"owner":                    connection.Name,
+				"owner.kind":               connection.Kind,
+				"owner.namespace":          connection.Namespace,
 			},
 			OwnerReferences: []metav1.OwnerReference{
 				{
@@ -415,10 +416,10 @@ func getOwnedSecret(connection *dbaas.MongoDBAtlasConnection, username, password
 			GenerateName: "atlas-db-user-",
 			Namespace:    connection.Namespace,
 			Labels: map[string]string{
-				"managed-by":      "atlas-operator",
-				"owner":           connection.Name,
-				"owner.kind":      connection.Kind,
-				"owner.namespace": connection.Namespace,
+				connectionsecret.VendorKey: connectionsecret.VendorVal,
+				"owner":                    connection.Name,
+				"owner.kind":               connection.Kind,
+				"owner.namespace":          connection.Namespace,
 			},
 			OwnerReferences: []metav1.OwnerReference{
 				{
