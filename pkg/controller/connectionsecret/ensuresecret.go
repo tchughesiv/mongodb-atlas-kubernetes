@@ -16,8 +16,8 @@ import (
 const (
 	ProjectLabelKey string = "atlas.mongodb.com/project-id"
 	ClusterLabelKey string = "atlas.mongodb.com/cluster-name"
-	TypeLabelKey           = "atlas.mongodb.com/type"
-	CredLabelVal           = "credentials"
+	TypeLabelKey           = "type"
+	CredLabelVal           = "dbaas-vendor-credentials"
 
 	connectionSecretStdKey    string = "connectionStringStandard"
 	connectionSecretStdSrvKey string = "connectionStringStandardSrv"
