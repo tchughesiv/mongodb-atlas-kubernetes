@@ -119,6 +119,44 @@ metadata:
             "usernames": [
               "username@mongodb.com"
             ]
+            "instanceID": "606b2ffbc9a90e310e642482",
+            "inventoryRef": {
+              "name": "test-inventory",
+              "namespace": "mongodb-atlas-system"
+            }
+          }
+        },
+        {
+          "apiVersion": "dbaas.redhat.com/v1alpha1",
+          "kind": "MongoDBAtlasInstance",
+          "metadata": {
+            "name": "test-instance"
+          },
+          "spec": {
+            "cloudProvider": "aws",
+            "cloudRegion": "US_EAST_1",
+            "inventoryRef": {
+              "name": "test-inventory",
+              "namespace": "mongodb-atlas-system"
+            },
+            "name": "my-cluster-free",
+            "otherInstanceParams": {
+              "instanceSizeName": "M0",
+              "projectName": "my-atlas-project-free"
+            }
+          }
+        },
+        {
+          "apiVersion": "dbaas.redhat.com/v1alpha1",
+          "kind": "MongoDBAtlasInventory",
+          "metadata": {
+            "name": "test-inventory"
+          },
+          "spec": {
+            "credentialsRef": {
+              "name": "my-atlas-key",
+              "namespace": "mongodb-atlas-system"
+            }
           }
         }
       ]

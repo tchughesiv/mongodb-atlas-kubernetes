@@ -51,6 +51,14 @@ const (
 	ServerlessPrivateEndpointReady        ConditionReason = "ServerlessPrivateEndpointReady"
 	ManagedNamespacesReady                ConditionReason = "ManagedNamespacesReady"
 	CustomZoneMappingReady                ConditionReason = "CustomZoneMappingReady"
+	ClusterNotCreatedInAtlas              ConditionReason = "ClusterNotCreatedInAtlas"
+	ClusterNotUpdatedInAtlas              ConditionReason = "ClusterNotUpdatedInAtlas"
+	ClusterCreating                       ConditionReason = "ClusterCreating"
+	ClusterUpdating                       ConditionReason = "ClusterUpdating"
+	ClusterDeleting                       ConditionReason = "ClusterDeleting"
+	ClusterDeleted                        ConditionReason = "ClusterDeleted"
+	ClusterConnectionSecretsNotCreated    ConditionReason = "ClusterConnectionSecretsNotCreated"
+	ClusterAdvancedOptionsAreNotReady     ConditionReason = "ClusterAdvancedOptionsAreNotReady"
 )
 
 // Atlas Database User reasons
@@ -91,4 +99,15 @@ const (
 	MongoDBAtlasConnectionBackendError        ConditionReason = "BackendError"
 	MongoDBAtlasConnectionAuthenticationError ConditionReason = "AuthenticationError"
 	MongoDBAtlasConnectionInprogress          ConditionReason = "Inprogress"
+)
+
+// MongoDBAtlasInstance reasons
+const (
+	MongoDBAtlasInstanceReady               ConditionReason = "Ready"
+	MongoDBAtlasInstanceAtlasUnreachable    ConditionReason = "Unreachable"
+	MongoDBAtlasInstanceInventoryNotFound   ConditionReason = "InventoryNotFound"
+	MongoDBAtlasInstanceClusterNotFound     ConditionReason = "AtlasClusterNotFound"
+	MongoDBAtlasInstanceBackendError        ConditionReason = "BackendError"
+	MongoDBAtlasInstanceAuthenticationError ConditionReason = "AuthenticationError"
+	MongoDBAtlasInstanceInprogress          ConditionReason = "Inprogress"
 )
