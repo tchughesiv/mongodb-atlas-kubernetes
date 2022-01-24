@@ -483,7 +483,7 @@ func buildConnectionSecret(name string) corev1.Secret {
 			Name:      name,
 			Namespace: namespace.Name,
 			Labels: map[string]string{
-				"atlas.mongodb.com/type": "credentials",
+				"type": "credentials",
 			},
 		},
 		StringData: map[string]string{"orgId": connection.OrgID, "publicApiKey": connection.PublicKey, "privateApiKey": connection.PrivateKey},

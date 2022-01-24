@@ -28,7 +28,7 @@ kubectl create secret generic mongodb-atlas-operator-api-key \
          --from-literal="privateApiKey=<the_atlas_api_private_key>" \
          -n mongodb-atlas-system
 
-kubectl label secret mongodb-atlas-operator-api-key atlas.mongodb.com/type=credentials -n mongodb-atlas-system
+kubectl label secret mongodb-atlas-operator-api-key type=credentials -n mongodb-atlas-system
 ```
 
 **2.** Create an `AtlasProject` Custom Resource
@@ -74,7 +74,7 @@ EOF
 ```
 kubectl create secret generic the-user-password --from-literal="password=P@@sword%"
 
-kubectl label secret the-user-password atlas.mongodb.com/type=credentials
+kubectl label secret the-user-password type=credentials
 ```
 
 **5.** Create an `AtlasDatabaseUser` Custom Resource
