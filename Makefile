@@ -6,7 +6,9 @@ SHELL := /usr/bin/env bash
 # To re-generate a bundle for another specific version without changing the standard setup, you can:
 # - use the VERSION as arg of the bundle target (e.g make bundle VERSION=0.0.2)
 # - use environment variables to overwrite this value (e.g export VERSION=0.0.2)
-VERSION ?= 0.5.0
+VERSION ?= 0.8.0
+
+CONTAINER_ENGINE?=docker
 
 # CHANNELS define the bundle channels used in the bundle.
 # Add a new line here if you would like to change its default config. (E.g CHANNELS = "preview,fast,stable")
@@ -37,7 +39,7 @@ IMGVERSION ?= $(IMG):$(VERSION)
 BUNDLE_IMG ?= $(IMG)-bundle:$(VERSION)
 
 # The image tag given to the resulting catalog image (e.g. make catalog-build CATALOG_IMG=example.com/operator-catalog:0.2.0).
-CATALOG_IMG ?= $(IMG)-catalog:latest
+CATALOG_IMG ?= $(IMG)-catalog:$(VERSION)
 
 # Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
 ifeq (,$(shell go env GOBIN))
@@ -151,17 +153,17 @@ bundle: manifests kustomize ## Generate bundle manifests and metadata, update se
 
 .PHONY: bundle-build
 bundle-build: ## Build the bundle image.
-	docker build -f bundle.Dockerfile -t $(BUNDLE_IMG) .
+	$(CONTAINER_ENGINE) build -f bundle.Dockerfile -t $(BUNDLE_IMG) .
 
 .PHONY: bundle-push
 bundle-push: ## Push the bundle image.
-	docker push $(BUNDLE_IMG)
+	$(CONTAINER_ENGINE) push $(BUNDLE_IMG)
 
 docker-build: ## Build the docker image
-	docker build -t $(IMGVERSION) .
+	$(CONTAINER_ENGINE) build -t $(IMGVERSION) .
 
 docker-push: ## Push the docker image
-	docker push $(IMGVERSION)
+	$(CONTAINER_ENGINE) push $(IMGVERSION)
 
 # Additional make goals
 .PHONY: run-kind
@@ -218,9 +220,9 @@ endif
 # https://github.com/operator-framework/community-operators/blob/7f1438c/docs/packaging-operator.md#updating-your-existing-operator
 .PHONY: catalog-build
 catalog-build: opm ## Build a catalog image.
-	$(OPM) index add --container-tool docker --mode semver --tag $(CATALOG_IMG) --bundles $(BUNDLE_IMGS) $(FROM_INDEX_OPT)
+	$(OPM) index add --container-tool $(CONTAINER_ENGINE) --mode semver --tag $(CATALOG_IMG) --bundles $(BUNDLE_IMGS) $(FROM_INDEX_OPT)
 
 # Push the catalog image.
 .PHONY: catalog-push
 catalog-push: ## Push a catalog image.
-	docker push $(CATALOG_IMG)
+	$(CONTAINER_ENGINE) push $(CATALOG_IMG)
