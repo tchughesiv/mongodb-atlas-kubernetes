@@ -11,6 +11,8 @@ CONTAINER_ENGINE?=docker
 # - use environment variables to overwrite this value (e.g export VERSION=0.0.2)
 VERSION ?= $(shell git describe --tags --dirty --broken | cut -c 2-)
 
+CONTAINER_ENGINE?=docker
+
 # CHANNELS define the bundle channels used in the bundle.
 # Add a new line here if you would like to change its default config. (E.g CHANNELS = "preview,fast,stable")
 # To re-generate a bundle for other specific channels without changing the standard setup, you can:
@@ -193,7 +195,7 @@ bundle-build: ## Build the bundle image.
 	$(CONTAINER_ENGINE) build -f bundle.Dockerfile -t $(BUNDLE_IMG) .
 
 .PHONY: bundle-push
-bundle-push:
+bundle-push: ## Push the bundle image.
 	$(CONTAINER_ENGINE) push $(BUNDLE_IMG)
 
 # A comma-separated list of bundle images (e.g. make catalog-build BUNDLE_IMGS=example.com/operator-bundle:v0.1.0,example.com/operator-bundle:v0.2.0).
@@ -205,7 +207,7 @@ CATALOG_DIR ?= ./scripts/openshift/atlas-catalog
 #catalog-build: IMG=
 catalog-build: opm ## bundle bundle-push ## Build file-based bundle
 	ifneq ($(origin CATALOG_BASE_IMG), undefined)
-		$(OPM) index add --container-tool docker --mode semver --tag $(CATALOG_IMAGE) --bundles $(BUNDLE_IMGS) --from-index $(CATALOG_BASE_IMG)
+		$(OPM) index add --container-tool $(CONTAINER_ENGINE) --mode semver --tag $(CATALOG_IMAGE) --bundles $(BUNDLE_IMGS) --from-index $(CATALOG_BASE_IMG)
 	else
 		$(MAKE) image IMG=$(REGISTRY)/mongodb-atlas-operator:$(VERSION)
 		CATALOG_DIR=$(CATALOG_DIR) \
@@ -217,7 +219,7 @@ catalog-build: opm ## bundle bundle-push ## Build file-based bundle
 	endif
 
 docker-build: ## Build the docker image
-	docker build -t $(IMGVERSION) .
+	$(CONTAINER_ENGINE) build -t $(IMGVERSION) .
 
 .PHONY: catalog-push
 catalog-push:
@@ -254,7 +256,7 @@ deploy-olm: bundle-build bundle-push catalog-build catalog-push build-catalogsou
 
 .PHONY: image-push
 image-push: ## Push the docker image
-	$(CONTAINER_ENGINE) push ${IMG}
+	$(CONTAINER_ENGINE) push ${IMGVERSION}
 
 # Additional make goals
 .PHONY: run-kind
