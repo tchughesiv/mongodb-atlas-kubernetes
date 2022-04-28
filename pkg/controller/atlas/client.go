@@ -27,7 +27,7 @@ func Client(atlasDomain string, connection Connection, log *zap.SugaredLogger) (
 	if err != nil {
 		return mongodbatlas.Client{}, err
 	}
-	client.UserAgent = fmt.Sprintf("%s/%s (%s;%s)", "MongoDBAtlasKubernetesOperator", version.Version, runtime.GOOS, runtime.GOARCH)
+	client.UserAgent = fmt.Sprintf("%s/%s (%s;%s)", "MongoDBAtlasKubernetesOperatorRHODA", ProductVersion, runtime.GOOS, runtime.GOARCH)
 
 	return *client, nil
 }
