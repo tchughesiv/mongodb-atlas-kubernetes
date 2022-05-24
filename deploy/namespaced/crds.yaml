@@ -2969,6 +2969,7 @@ status:
     plural: ""
   conditions: []
   storedVersions: []
+<<<<<<< HEAD
 ---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
@@ -3453,3 +3454,5 @@ status:
   conditions: []
   storedVersions: []
 >>>>>>> 62ff49e (Support provisioning with DBaaS operator)
+=======
+>>>>>>> 34c25d7 (addtl rebase fixes)
