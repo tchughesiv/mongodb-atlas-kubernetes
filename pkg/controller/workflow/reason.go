@@ -59,6 +59,10 @@ const (
 	ClusterDeleted                        ConditionReason = "ClusterDeleted"
 	ClusterConnectionSecretsNotCreated    ConditionReason = "ClusterConnectionSecretsNotCreated"
 	ClusterAdvancedOptionsAreNotReady     ConditionReason = "ClusterAdvancedOptionsAreNotReady"
+	DeploymentDeleting                    ConditionReason = "DeploymentDeleting"
+	DeploymentDeleted                     ConditionReason = "DeploymentDeleted"
+	DeploymentConnectionSecretsNotCreated ConditionReason = "DeploymentConnectionSecretsNotCreated"
+	DeploymentAdvancedOptionsAreNotReady  ConditionReason = "DeploymentAdvancedOptionsAreNotReady"
 )
 
 // Atlas Database User reasons
