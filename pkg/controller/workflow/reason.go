@@ -110,6 +110,7 @@ const (
 	MongoDBAtlasInstanceReady               ConditionReason = "Ready"
 	MongoDBAtlasInstanceAtlasUnreachable    ConditionReason = "Unreachable"
 	MongoDBAtlasInstanceInventoryNotFound   ConditionReason = "InventoryNotFound"
+	MongoDBAtlasInstanceNotReady            ConditionReason = "InstanceNotReady"
 	MongoDBAtlasInstanceClusterNotFound     ConditionReason = "AtlasClusterNotFound"
 	MongoDBAtlasInstanceBackendError        ConditionReason = "BackendError"
 	MongoDBAtlasInstanceAuthenticationError ConditionReason = "AuthenticationError"
