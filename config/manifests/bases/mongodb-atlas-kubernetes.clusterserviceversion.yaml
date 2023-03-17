@@ -7,63 +7,65 @@ metadata:
     categories: Database
     description: The MongoDB Atlas Kubernetes Operator enables easy management of
       Clusters in MongoDB Atlas
-    olm.skipRange: '>=0.2.0 <0.3.0'
-  name: mongodb-atlas-kubernetes.v0.0.0
-  namespace: placeholder
   labels:
-    operatorframework.io/os.linux: supported
     operatorframework.io/arch.amd64: supported
     operatorframework.io/arch.arm64: supported
+    operatorframework.io/os.linux: supported
+  name: mongodb-atlas-kubernetes.v0.0.0
+  namespace: placeholder
 spec:
   apiservicedefinitions: {}
   customresourcedefinitions:
     owned:
-      - description: AtlasDeployment is the Schema for the atlasclusters API
-        displayName: Atlas Deployment
-        kind: AtlasDeployment
-        name: atlasdeployments.atlas.mongodb.com
-        version: v1
-      - description: AtlasDatabaseUser is the Schema for the Atlas Database User API
-        displayName: Atlas Database User
-        kind: AtlasDatabaseUser
-        name: atlasdatabaseusers.atlas.mongodb.com
-        version: v1
-      - description: AtlasProject is the Schema for the atlasprojects API
-        displayName: Atlas Project
-        kind: AtlasProject
-        name: atlasprojects.atlas.mongodb.com
-        version: v1
-      - description: AtlasBackupSchedule is the Schema for the atlasbackupschedule API
-        displayName: Atlas Backup Schedule
-        kind: AtlasBackupSchedule
-        name: atlasbackupschedules.atlas.mongodb.com
-        version: v1
-      - description: AtlasBackupPolicy is the Schema for the atlasbackuppolicy API
-        displayName: Atlas Backup Policy
-        kind: AtlasBackupPolicy
-        name: atlasbackuppolicies.atlas.mongodb.com
-        version: v1
-      - description: AtlasTeam is the Schema for the Atlas Teams API
-        displayName: Atlas Team
-        kind: AtlasTeam
-        name: atlasteams.atlas.mongodb.com
-        version: v1
-      - description: MongoDBAtlasConnection is the Schema for the MongoDBAtlasConnections API
-        displayName: Mongo DBAtlas Connection
-        kind: MongoDBAtlasConnection
-        name: mongodbatlasconnections.dbaas.redhat.com
-        version: v1alpha1
-      - description: MongoDBAtlasInventory is the Schema for the MongoDBAtlasInventory API
-        displayName: Mongo DBAtlas Inventory
-        kind: MongoDBAtlasInventory
-        name: mongodbatlasinventories.dbaas.redhat.com
-        version: v1alpha1
-      - description: MongoDBAtlasInstance is the Schema for the MongoDBAtlasInstance
-          API
-        displayName: Mongo DBAtlas Instance
-        kind: MongoDBAtlasInstance
-        name: mongodbatlasinstances.dbaas.redhat.com
-        version: v1alpha1
+    - description: AtlasDeployment is the Schema for the atlasclusters API
+      displayName: Atlas Deployment
+      kind: AtlasDeployment
+      name: atlasdeployments.atlas.mongodb.com
+      version: v1
+    - description: AtlasBackupPolicy is the Schema for the atlasbackuppolicies API
+      displayName: Atlas Backup Policy
+      kind: AtlasBackupPolicy
+      name: atlasbackuppolicies.atlas.mongodb.com
+      version: v1
+    - description: AtlasBackupSchedule is the Schema for the atlasbackupschedules
+        API
+      displayName: Atlas Backup Schedule
+      kind: AtlasBackupSchedule
+      name: atlasbackupschedules.atlas.mongodb.com
+      version: v1
+    - description: AtlasDatabaseUser is the Schema for the Atlas Database User API
+      displayName: Atlas Database User
+      kind: AtlasDatabaseUser
+      name: atlasdatabaseusers.atlas.mongodb.com
+      version: v1
+    - description: AtlasProject is the Schema for the atlasprojects API
+      displayName: Atlas Project
+      kind: AtlasProject
+      name: atlasprojects.atlas.mongodb.com
+      version: v1
+    - description: AtlasTeam is the Schema for the Atlas Teams API
+      displayName: Atlas Team
+      kind: AtlasTeam
+      name: atlasteams.atlas.mongodb.com
+      version: v1
+    - description: MongoDBAtlasConnection is the Schema for the MongoDBAtlasConnections
+        API
+      displayName: Mongo DBAtlas Connection
+      kind: MongoDBAtlasConnection
+      name: mongodbatlasconnections.dbaas.redhat.com
+      version: v1alpha1
+    - description: MongoDBAtlasInstance is the Schema for the MongoDBAtlasInstance
+        API
+      displayName: Mongo DBAtlas Instance
+      kind: MongoDBAtlasInstance
+      name: mongodbatlasinstances.dbaas.redhat.com
+      version: v1alpha1
+    - description: MongoDBAtlasInventory is the Schema for the MongoDBAtlasInventory
+        API
+      displayName: Mongo DBAtlas Inventory
+      kind: MongoDBAtlasInventory
+      name: mongodbatlasinventories.dbaas.redhat.com
+      version: v1alpha1
   description: |
     The MongoDB Atlas Operator provides a native integration between the Kubernetes orchestration platform and MongoDB Atlas —
     the only multi-cloud document database service that gives you the versatility you need to build sophisticated and resilient applications that can adapt to changing customer demands and market trends.
@@ -182,14 +184,14 @@ spec:
       deployments: null
     strategy: ""
   installModes:
-    - supported: true
-      type: OwnNamespace
-    - supported: true
-      type: SingleNamespace
-    - supported: true
-      type: MultiNamespace
-    - supported: true
-      type: AllNamespaces
+  - supported: true
+    type: OwnNamespace
+  - supported: true
+    type: SingleNamespace
+  - supported: true
+    type: MultiNamespace
+  - supported: true
+    type: AllNamespaces
   keywords:
   - MongoDB
   - Atlas
