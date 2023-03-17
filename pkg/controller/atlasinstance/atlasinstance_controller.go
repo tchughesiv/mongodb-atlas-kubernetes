@@ -365,7 +365,7 @@ func (r *MongoDBAtlasInstanceReconciler) getAtlasProjectForCreation(instance *db
 		},
 		Spec: v1.AtlasProjectSpec{
 			Name:                data.ProjectName,
-			ConnectionSecret:    &common.ResourceRef{Name: inventory.Spec.CredentialsRef.Name},
+			ConnectionSecret:    &common.ResourceRefNamespaced{Name: inventory.Spec.CredentialsRef.Name},
 			ProjectIPAccessList: []project.IPAccessList{},
 		},
 	}, nil

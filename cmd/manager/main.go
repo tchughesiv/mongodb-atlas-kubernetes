@@ -117,7 +117,7 @@ func main() {
 			},
 		})
 	}
-	logger.Sugar().Infof("MongoDB Atlas Operator version %s", version)
+	logger.Sugar().Infof("MongoDB Atlas Operator version %s", version.Version)
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme:                 scheme,

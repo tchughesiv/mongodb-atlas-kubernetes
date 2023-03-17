@@ -133,15 +133,9 @@ rules:
   - patch
   - update
 - apiGroups:
-<<<<<<< HEAD
   - atlas.mongodb.com
   resources:
   - atlasteams
-=======
-  - dbaas.redhat.com
-  resources:
-  - dbaasproviders
->>>>>>> 26c3136 (Integrate Atlas Operator with Red Hat DBaaS)
   verbs:
   - create
   - delete
@@ -151,15 +145,29 @@ rules:
   - update
   - watch
 - apiGroups:
-<<<<<<< HEAD
   - atlas.mongodb.com
   resources:
   - atlasteams/status
-=======
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - dbaas.redhat.com
+  resources:
+  - dbaasproviders
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
   - dbaas.redhat.com
   resources:
   - dbaasproviders/status
->>>>>>> 26c3136 (Integrate Atlas Operator with Red Hat DBaaS)
   verbs:
   - get
   - patch

@@ -33,12 +33,12 @@ const (
 
 // PrepareResource queries the Custom Resource 'request.NamespacedName' and populates the 'resource' pointer.
 func PrepareResource(client client.Client, request reconcile.Request, resource mdbv1.AtlasCustomResource, log *zap.SugaredLogger) workflow.Result {
-	return GetResource(client, request.Namespace, request.Name, resource, log)
+	return GetResource(client, resource, log)
 }
 
 // GetResource queries the Custom Resource key and populates the 'resource' pointer.
-func GetResource(client client.Client, namespace, name string, resource client.Object, log *zap.SugaredLogger) workflow.Result {
-	key := types.NamespacedName{Namespace: namespace, Name: name}
+func GetResource(client client.Client, resource client.Object, log *zap.SugaredLogger) workflow.Result {
+	key := types.NamespacedName{Namespace: resource.GetNamespace(), Name: resource.GetName()}
 	err := client.Get(context.Background(), key, resource)
 	if err != nil {
 		if apiErrors.IsNotFound(err) {
