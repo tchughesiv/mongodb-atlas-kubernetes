@@ -46,8 +46,11 @@ const (
 	DeploymentNotUpdatedInAtlas           ConditionReason = "DeploymentNotUpdatedInAtlas"
 	DeploymentCreating                    ConditionReason = "DeploymentCreating"
 	DeploymentUpdating                    ConditionReason = "DeploymentUpdating"
-	DeploymentConnectionSecretsNotCreated ConditionReason = "DeploymentConnectionSecretsNotCreated"
 	DeploymentAdvancedOptionsReady        ConditionReason = "DeploymentAdvancedOptionsReady"
+	DeploymentDeleting                    ConditionReason = "DeploymentDeleting"
+	DeploymentDeleted                     ConditionReason = "DeploymentDeleted"
+	DeploymentConnectionSecretsNotCreated ConditionReason = "DeploymentConnectionSecretsNotCreated"
+	DeploymentAdvancedOptionsAreNotReady  ConditionReason = "DeploymentAdvancedOptionsAreNotReady"
 	ServerlessPrivateEndpointReady        ConditionReason = "ServerlessPrivateEndpointReady"
 	ManagedNamespacesReady                ConditionReason = "ManagedNamespacesReady"
 	CustomZoneMappingReady                ConditionReason = "CustomZoneMappingReady"
@@ -59,10 +62,6 @@ const (
 	ClusterDeleted                        ConditionReason = "ClusterDeleted"
 	ClusterConnectionSecretsNotCreated    ConditionReason = "ClusterConnectionSecretsNotCreated"
 	ClusterAdvancedOptionsAreNotReady     ConditionReason = "ClusterAdvancedOptionsAreNotReady"
-	DeploymentDeleting                    ConditionReason = "DeploymentDeleting"
-	DeploymentDeleted                     ConditionReason = "DeploymentDeleted"
-	DeploymentConnectionSecretsNotCreated ConditionReason = "DeploymentConnectionSecretsNotCreated"
-	DeploymentAdvancedOptionsAreNotReady  ConditionReason = "DeploymentAdvancedOptionsAreNotReady"
 )
 
 // Atlas Database User reasons

@@ -141,6 +141,25 @@ rules:
   - atlas.mongodb.com
   resources:
   - atlasteams/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - dbaas.redhat.com
+  resources:
+  - mongodbatlasconnections
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - dbaas.redhat.com
+  resources:
   - mongodbatlasconnections/status
   verbs:
   - get
